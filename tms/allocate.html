@@ -1,0 +1,911 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Room Allocation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Audiowide&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --space-base: 1rem;
+      --primary-gradient: linear-gradient(135deg, #f9f9f9 0%, #e6e6e6 100%);
+      --accent-color: #4a90e2;
+      --accent-hover: #357abd;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --card-bg: #ffffff;
+      --border-radius: 12px;
+      --border-color: #e0e0e0;
+      --status-occupied: #ff6b6b;
+      --status-partial: #ffd166;
+      --status-vacant: #4ecdc4;
+      --input-bg: #ffffff;
+      --input-text: #333333;
+      --button-bg: var(--accent-color);
+      --button-hover: var(--accent-hover);
+      --font-display: "Audiowide", sans-serif;
+      --font-body: "Inter", sans-serif;
+      --font-family-heading: 'Montserrat', sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth; /* Enable smooth scrolling for the entire page */
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--primary-gradient);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    header {
+      background: rgba(255, 255, 255, 0.9);
+      padding: var(--space-base) 0;
+      backdrop-filter: blur(12px);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--space-base);
+    }
+
+    .logo {
+        font-family: var(--font-family-heading);
+        font-size: 1.5rem;
+        font-weight: 800;
+        color:#2563EB;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+    .allocation-container {
+      max-width: 1200px;
+      margin: 80px auto 150px;
+      padding: 0 var(--space-base);
+    }
+
+    /* Room Grid Styling */
+    .room-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .room-box {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .room-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .room-box.selected {
+      border: 2px solid var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25);
+    }
+
+    .room-box.vacant {
+      background: linear-gradient(135deg, var(--status-vacant) 0%, rgba(78, 205, 196, 0.7) 100%);
+    }
+
+    .room-box.partial {
+      background: linear-gradient(135deg, var(--status-partial) 0%, rgba(255, 209, 102, 0.7) 100%);
+    }
+
+    .room-box.occupied {
+      background: linear-gradient(135deg, var(--status-occupied) 0%, rgba(255, 107, 107, 0.7) 100%);
+    }
+
+    .room-number {
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .room-status {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: white;
+      padding: 3px 6px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .occupancy-icon {
+      margin-top: 0.5rem;
+      font-size: 1.5rem;
+    }
+
+    .floor-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.5rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+
+    form {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(8px);
+      padding: 2rem;
+      margin-top: 2rem;
+      scroll-margin-top: 100px; /* Add space above the form when scrolled to */
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--card-bg);
+      color: var(--input-text);
+      font-size: 1rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25);
+    }
+
+    button {
+      background: #2563EB;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+   
+      padding-bottom: 30px;
+      /* font-weight: 600; */
+      transition: all 0.3s ease;
+      height: 35px;
+      width: 150px;
+    }
+
+    button:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+    }
+
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color:white;
+        box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+        display: flex;
+        z-index: 100;
+      }
+
+      .nav-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  padding: 8px ;
+  padding-inline: 300px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  color:#2563EB ;
+
+}
+
+.nav-button svg {
+  margin-bottom: 2px;
+}
+.bottom-nav .nav-button:hover {
+        background: rgb(0, 110, 255);
+        color: white;
+      }
+      .nav-item.active {
+        color: blue;
+
+      }
+
+      .nav-button.nav-item.active {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+    
+      }
+
+    /* Popup Container */
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      display: none;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    /* Popup Overlay */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      z-index: 999;
+      display: none;
+    }
+
+    /* Popup Content */
+    .popup p {
+      font-size: 1.1rem;
+      margin-bottom: 25px;
+    }
+
+    /* Popup Button */
+    .popup button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s ease;
+    }
+
+    .popup button:hover {
+      background: #0056b3;
+    }
+
+    /* Vacant Button */
+    .vacant-button {
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+    }
+
+    .vacant-button:hover {
+      background: #ff4c4c;
+      transform: translateY(-2px);
+    }
+
+    /* Section Title */
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 2rem 0 1rem;
+      color: var(--text-primary);
+    }
+
+    /* Form Section */
+    .form-section {
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .form-section:last-child {
+      border-bottom: none;
+    }
+
+    /* Highlight effect for form when scrolled to */
+    @keyframes highlight-form {
+      0% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(74, 144, 226, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0); }
+    }
+
+    .highlight-form {
+      animation: highlight-form 1s ease-out;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .room-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--white);
+        box-shadow: var(--shadow);
+        z-index: 100;
+        height: 70px;
+      }
+
+      .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 100%;
+        padding: 0 1.5rem;
+      }
+
+     
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: var(--border-radius);
+        font-weight: 500;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: var(--transition);
+        border: none;
+        outline: none;
+        text-decoration: none;
+      }
+
+      .btn-primary {
+        background-color: #1D4ED8;
+        color: var(--white);
+      }
+
+      .btn-primary:hover {
+        background-color: #1D4ED8;
+      }
+
+      .btn-icon {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+      }
+
+  </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+          <a href="/" class="logo">
+            <!-- <svg class="logo-icon" viewBox="0 0 24 24">
+              <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
+            </svg> -->
+            mytenants.in
+          </a>
+          <div class="header-actions">
+            <button id="exportBtn" class="btn-btn-primary">
+              <svg class="btn-icon" viewBox="0 0 24 24">
+                <path d="M14,2H6C4.89,2 4,2.89 4,4V20C4,21.11 4.89,22 6,22H18C19.11,22 20,21.11 20,20V8L14,2M18,20H6V4H13V9H18V20M10,19L12,15H9V10H15V15H12L14,19H10Z" />
+              </svg>
+              Export to CSV
+            </button>
+          </div>
+        </div>
+      </header>
+
+  <div class="allocation-container">
+    <!-- Room Selection Grid -->
+    <h2 class="section-title">Select a Room</h2>
+    <div id="roomGridContainer"></div>
+
+    <!-- Form with ID for scrolling target -->
+    <form id="allocationForm">
+      <input type="hidden" id="selectedRoom" value="">
+      
+      <!-- Basic Details Section -->
+      <div class="form-section">
+        <h3 class="section-title">Basic Details</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="moveInDate">Move-In Date</label>
+            <input type="date" id="moveInDate" required>
+          </div>
+          <div class="form-group">
+            <label for="rentStatus">Rent Status</label>
+            <select id="rentStatus" required>
+              <option value="Pending">Pending</option>
+              <option value="Unpaid">Unpaid</option>
+              <option value="Paid">Paid</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="lastPaidDate">Last Paid Date</label>
+            <input type="date" id="lastPaidDate" required>
+          </div>
+        </div>
+      </div>
+
+      <!-- Financial Details Section -->
+      <div class="form-section">
+        <h3 class="section-title">Financial Details</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="rentAmount">Rent Amount</label>
+            <input type="number" id="rentAmount" placeholder="Enter amount" required>
+          </div>
+          <div class="form-group">
+            <label for="foodCharges">Food Charges</label>
+            <input type="number" id="foodCharges" placeholder="Enter food charges">
+          </div>
+          <div class="form-group">
+            <label for="electricityCharges">Electricity Charges</label>
+            <input type="number" id="electricityCharges" placeholder="Enter electricity charges">
+          </div>
+        </div>
+      </div>
+
+      <!-- Tenant 1 Details Section -->
+      <div id="tenant1Section" class="form-section">
+        <h3 class="section-title">Tenant 1 Details</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="tenantName1">Full Name</label>
+            <input type="text" id="tenantName1" placeholder="Full name" required>
+          </div>
+          <div class="form-group">
+            <label for="tenantGender1">Gender</label>
+            <select id="tenantGender1" required>
+              <option value="M">Male</option>
+              <option value="F">Female</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="tenantContact1">Contact</label>
+            <input type="text" id="tenantContact1" placeholder="Phone number" required>
+          </div>
+          <div class="form-group">
+            <label for="tenantGovtId1">Government ID</label>
+            <input type="text" id="tenantGovtId1" placeholder="Aadhaar/Voter ID/etc." required>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tenant 2 Details Section -->
+      <div class="form-section">
+        <h3 class="section-title">Tenant 2 Details (Optional)</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="tenantName2">Full Name</label>
+            <input type="text" id="tenantName2" placeholder="Full name">
+          </div>
+          <div class="form-group">
+            <label for="tenantGender2">Gender</label>
+            <select id="tenantGender2">
+              <option value="M">Male</option>
+              <option value="F">Female</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="tenantContact2">Contact</label>
+            <input type="text" id="tenantContact2" placeholder="Phone number">
+          </div>
+          <div class="form-group">
+            <label for="tenantGovtId2">Government ID</label>
+            <input type="text" id="tenantGovtId2" placeholder="Aadhaar/Voter ID/etc.">
+          </div>
+        </div>
+      </div>
+
+      <button type="submit">Allocate Room</button>
+      <button type="button" class="vacant-button" id="vacantButton">Vacant Room</button>
+    </form>
+  </div>
+
+  <!-- Popup for Success/Error Messages -->
+  <div class="overlay" id="overlay"></div>
+  <div class="popup" id="popup">
+    <p id="popupMessage"></p>
+    <button id="closePopup">OK</button>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="bottom-nav">
+    <a class='nav-button' href='allocate.html'>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+      </svg>
+      Allocate
+    </a>
+    <a class='nav-button active' href='index.html'>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z"/>
+      </svg>
+      Home
+    </a>
+    <a class='nav-button' href='rent.html'>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M11.8,10.9c-2.27-0.59-3-1.2-3-2.15c0-1.09,1.01-1.85,2.7-1.85c1.78,0,2.44,0.85,2.5,2.1h2.21c-0.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94,0.42-3.5,1.68-3.5,3.61c0,2.31,1.91,3.46,4.7,4.13c2.5,0.6,3,1.48,3,2.41c0,0.69-0.49,1.79-2.7,1.79c-2.06,0-2.87-0.92-2.98-2.1h-2.2c0.12,2.19,1.76,3.42,3.68,3.83V21h3v-2.15c1.95-0.37,3.5-1.5,3.5-3.55C16.5,12.46,14.07,11.49,11.8,10.9z"/>
+      </svg>
+      Rent
+    </a>
+  </nav>
+  <script type="module">
+    // Firebase Configuration
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+    import { getDatabase, ref, set, get, remove, onValue } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBEX5lj5VRhmlxAhHskQJVB1G6uoVEVvmQ",
+      authDomain: "diamoundbhai.firebaseapp.com",
+      projectId: "diamoundbhai",
+      storageBucket: "diamoundbhai.appspot.com",
+      messagingSenderId: "236932120968",
+      appId: "1:236932120968:web:a3d9ec830d48757024fa3d",
+      measurementId: "G-MK06SH1QNL",
+      databaseURL: "https://diamoundbhai-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    // Helper function to show popup messages
+    function showPopup(message, type) {
+      const popup = document.getElementById("popup");
+      const overlay = document.getElementById("overlay");
+      const popupMessage = document.getElementById("popupMessage");
+
+      popupMessage.textContent = message;
+      popup.className = `popup ${type}`;
+      popup.style.display = "block";
+      overlay.style.display = "block";
+
+      // Auto-close the popup after 3 seconds
+      setTimeout(() => {
+        popup.style.display = "none";
+        overlay.style.display = "none";
+      }, 3000);
+    }
+
+    // Close popup when OK button is clicked
+    document.getElementById("closePopup").addEventListener("click", function() {
+      document.getElementById("popup").style.display = "none";
+      document.getElementById("overlay").style.display = "none";
+    });
+
+    // Generate the room grid with visual representation
+    function generateRoomGrid() {
+      const roomGridContainer = document.getElementById("roomGridContainer");
+      roomGridContainer.innerHTML = '';
+
+      // Create rooms organized by floor
+      for (let floor = 1; floor <= 6; floor++) {
+        // Create floor section
+        const floorSection = document.createElement("div");
+        floorSection.className = "floor-section";
+        floorSection.innerHTML = `<h3 class="floor-title">Floor ${floor}</h3>`;
+        
+        // Create room grid for this floor
+        const floorGrid = document.createElement("div");
+        floorGrid.className = "room-grid";
+        
+        // Add rooms to this floor
+        for (let r = 1; r <= 10; r++) {
+          const roomNumber = `${floor}${r < 10 ? '0' + r : r}`;
+          
+          // Create room box
+          const roomBox = document.createElement("div");
+          roomBox.className = "room-box vacant"; // Default to vacant
+          roomBox.dataset.roomNumber = roomNumber;
+          
+          // Set initial content (will be updated with real data)
+          roomBox.innerHTML = `
+            <div class="room-number">${roomNumber}</div>
+            <div class="occupancy-icon">👤0</div>
+            <div class="room-status">Vacant</div>
+          `;
+          
+          // Add click event to select room and scroll to form
+          roomBox.addEventListener("click", function() {
+            // Remove selected class from all rooms
+            document.querySelectorAll(".room-box").forEach(box => {
+              box.classList.remove("selected");
+            });
+            
+            // Add selected class to this room
+            this.classList.add("selected");
+            
+            // Set the selected room in the hidden input
+            document.getElementById("selectedRoom").value = this.dataset.roomNumber;
+            
+            // Load room details
+            loadRoomDetails(this.dataset.roomNumber);
+            
+            // Scroll to the form section with smooth behavior
+            const form = document.getElementById("allocationForm");
+            
+            // Add highlight effect to the form
+            form.classList.remove("highlight-form");
+            // Trigger reflow to restart animation
+            void form.offsetWidth;
+            form.classList.add("highlight-form");
+            
+            // Scroll to the form
+            form.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'start'
+            });
+            
+            // Focus on the first input field after scrolling
+            setTimeout(() => {
+              document.getElementById("moveInDate").focus();
+            }, 800); // Delay to allow scroll to complete
+          });
+          
+          floorGrid.appendChild(roomBox);
+        }
+        
+        floorSection.appendChild(floorGrid);
+        roomGridContainer.appendChild(floorSection);
+      }
+
+      // Update room status from Firebase
+      updateRoomStatus();
+    }
+
+    // Update room status based on Firebase data
+    function updateRoomStatus() {
+      const roomsRef = ref(database, 'rooms');
+      
+      // Listen for changes in real-time
+      onValue(roomsRef, (snapshot) => {
+        const roomData = snapshot.exists() ? snapshot.val() : {};
+        
+        // Update all room boxes with current data
+        document.querySelectorAll(".room-box").forEach(roomBox => {
+          const roomNumber = roomBox.dataset.roomNumber;
+          const roomInfo = roomData[roomNumber];
+          
+          if (roomInfo) {
+            // Room is allocated
+            const tenants = roomInfo.tenants || [];
+            const occupancyCount = tenants.filter(t => t && t.trim() !== "").length;
+            
+            if (occupancyCount === 2) {
+              // Fully occupied
+              roomBox.className = "room-box occupied";
+              roomBox.querySelector(".occupancy-icon").innerHTML = "👥2";
+              roomBox.querySelector(".room-status").textContent = "Occupied";
+            } else if (occupancyCount === 1) {
+              // Partially occupied
+              roomBox.className = "room-box partial";
+              roomBox.querySelector(".occupancy-icon").innerHTML = "👤1";
+              roomBox.querySelector(".room-status").textContent = "Partial";
+            } else {
+              // Should be vacant, but has data
+              roomBox.className = "room-box vacant";
+              roomBox.querySelector(".occupancy-icon").innerHTML = "👤0";
+              roomBox.querySelector(".room-status").textContent = "Vacant";
+            }
+          } else {
+            // Room is vacant
+            roomBox.className = "room-box vacant";
+            roomBox.querySelector(".occupancy-icon").innerHTML = "👤0";
+            roomBox.querySelector(".room-status").textContent = "Vacant";
+          }
+        });
+      });
+    }
+
+    // Load existing room details
+    function loadRoomDetails(roomNumber) {
+      const roomRef = ref(database, 'rooms/' + roomNumber);
+      get(roomRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          const roomData = snapshot.val();
+          
+          // Basic details
+          document.getElementById("moveInDate").value = roomData.moveInDate || '';
+          document.getElementById("rentStatus").value = roomData.rentStatus || 'Pending';
+          document.getElementById("lastPaidDate").value = roomData.lastPaidDate || roomData.moveInDate || '';
+          
+          // Financial details
+          document.getElementById("rentAmount").value = roomData.rent_due || '';
+          document.getElementById("foodCharges").value = roomData.foodCharges || '';
+          document.getElementById("electricityCharges").value = roomData.electricityCharges || '';
+          
+          // Tenant 1 details
+          document.getElementById("tenantName1").value = roomData.tenants ? roomData.tenants[0] || '' : '';
+          document.getElementById("tenantGender1").value = roomData.gender1 || roomData.gender || 'M';
+          document.getElementById("tenantContact1").value = roomData.contactNumbers ? roomData.contactNumbers[0] || '' : '';
+          document.getElementById("tenantGovtId1").value = roomData.govtIds ? roomData.govtIds[0] || '' : '';
+          
+          // Tenant 2 details
+          document.getElementById("tenantName2").value = roomData.tenants && roomData.tenants.length > 1 ? roomData.tenants[1] || '' : '';
+          document.getElementById("tenantGender2").value = roomData.gender2 || 'M';
+          document.getElementById("tenantContact2").value = roomData.contactNumbers && roomData.contactNumbers.length > 1 ? roomData.contactNumbers[1] || '' : '';
+          document.getElementById("tenantGovtId2").value = roomData.govtIds && roomData.govtIds.length > 1 ? roomData.govtIds[1] || '' : '';
+        } else {
+          // Reset the form if no data exists
+          resetForm();
+        }
+      }).catch(err => {
+        console.error("Error loading room details:", err);
+        showPopup("Error loading room details: " + err.message, "error");
+      });
+    }
+
+    // Reset form fields
+    function resetForm() {
+      document.getElementById("moveInDate").value = '';
+      document.getElementById("rentStatus").value = 'Pending';
+      document.getElementById("lastPaidDate").value = '';
+      document.getElementById("rentAmount").value = '';
+      document.getElementById("foodCharges").value = '';
+      document.getElementById("electricityCharges").value = '';
+      document.getElementById("tenantName1").value = '';
+      document.getElementById("tenantGender1").value = 'M';
+      document.getElementById("tenantContact1").value = '';
+      document.getElementById("tenantGovtId1").value = '';
+      document.getElementById("tenantName2").value = '';
+      document.getElementById("tenantGender2").value = 'M';
+      document.getElementById("tenantContact2").value = '';
+      document.getElementById("tenantGovtId2").value = '';
+    }
+
+    // Handle form submission for allocation
+    document.getElementById("allocationForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const roomNumber = document.getElementById("selectedRoom").value;
+      if (!roomNumber) {
+        showPopup("Please select a room first.", "error");
+        return;
+      }
+
+      // Basic details
+      const moveInDate = document.getElementById("moveInDate").value;
+      const rentStatus = document.getElementById("rentStatus").value;
+      const lastPaidDate = document.getElementById("lastPaidDate").value || moveInDate;
+      
+      // Financial details
+      const rentAmount = document.getElementById("rentAmount").value;
+      const foodCharges = document.getElementById("foodCharges").value;
+      const electricityCharges = document.getElementById("electricityCharges").value;
+      
+      // Tenant 1 details
+      const tenantName1 = document.getElementById("tenantName1").value;
+      const tenantGender1 = document.getElementById("tenantGender1").value;
+      const tenantContact1 = document.getElementById("tenantContact1").value;
+      const tenantGovtId1 = document.getElementById("tenantGovtId1").value;
+      
+      // Tenant 2 details
+      const tenantName2 = document.getElementById("tenantName2").value.trim();
+      const tenantGender2 = document.getElementById("tenantGender2").value;
+      const tenantContact2 = document.getElementById("tenantContact2").value.trim();
+      const tenantGovtId2 = document.getElementById("tenantGovtId2").value.trim();
+
+      // Determine occupancy based on whether tenantName2 is provided
+      const occupancyStatus = tenantName2 ? "Fully Occupied" : "Partially Occupied";
+
+      // Build the roomData object without undefined values
+      let roomData = {
+        // Basic details
+        moveInDate: moveInDate,
+        rentStatus: rentStatus,
+        lastPaidDate: lastPaidDate,
+        occupancyStatus: occupancyStatus,
+        
+        // Financial details
+        rent_due: rentAmount,
+        foodCharges: foodCharges || "",
+        electricityCharges: electricityCharges || "",
+        
+        // Tenant details
+        tenants: [tenantName1, tenantName2].filter(val => val && val.trim() !== ""),
+        contactNumbers: [tenantContact1, tenantContact2].filter(val => val && val.trim() !== ""),
+        govtIds: [tenantGovtId1, tenantGovtId2].filter(val => val && val.trim() !== "")
+      };
+
+      if (tenantName2) {
+        // For multiple tenants, add gender1 and gender2
+        roomData.gender1 = tenantGender1 || "M";
+        roomData.gender2 = tenantGender2 || "M";
+      } else {
+        // For a single tenant, add gender
+        roomData.gender = tenantGender1 || "M";
+      }
+
+      const roomRef = ref(database, 'rooms/' + roomNumber);
+
+      // Save (or update) room details in Firebase
+      set(roomRef, roomData).then(() => {
+        showPopup("Room allocated successfully!", "success");
+        resetForm();
+        // Room status will update automatically via the onValue listener
+      }).catch((error) => {
+        showPopup("Error allocating room: " + error.message, "error");
+      });
+    });
+
+    // Vacant Button Functionality
+    document.getElementById("vacantButton").addEventListener("click", function() {
+      const roomNumber = document.getElementById("selectedRoom").value;
+      if (!roomNumber) {
+        showPopup("Please select a room first.", "error");
+        return;
+      }
+
+      const roomRef = ref(database, 'rooms/' + roomNumber);
+      remove(roomRef).then(() => {
+        showPopup("Room vacated successfully!", "success");
+        resetForm();
+        // Room status will update automatically via the onValue listener
+      }).catch((error) => {
+        showPopup("Error vacating room: " + error.message, "error");
+      });
+    });
+
+    // Initialize room grid on page load
+    generateRoomGrid();
+  </script>
+</body>
+</html>

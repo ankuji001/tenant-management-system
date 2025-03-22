@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mytenants.in</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Chart.js for the graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-light: #dbeafe;
+        --secondary: #10b981;
+        --secondary-dark: #059669;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --dark: #1e293b;
+        --gray: #64748b;
+        --light-gray: #e2e8f0;
+        --white: #ffffff;
+        --body-bg: #f8fafc;
+        --card-bg: #ffffff;
+        --border-radius: 0.5rem;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --font-family: 'Poppins', sans-serif;
+        --font-family-heading: 'Montserrat', sans-serif;
+        --transition: all 0.3s ease;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: var(--font-family);
+        background-color: var(--body-bg);
+        color: var(--dark);
+        min-height: 100vh;
+        line-height: 1.6;
+        padding-bottom: 70px;
+      }
+
+      /* Layout */
+      .container {
+        width: 100%;
+        padding: 0 1rem;
+      }
+
+      .main-content {
+        margin-top: 70px;
+        padding: 1.5rem 0;
+      }
+
+      /* Header */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--white);
+        box-shadow: var(--shadow);
+        z-index: 100;
+        height: 70px;
+      }
+
+      .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 100%;
+        padding: 0 1.5rem;
+      }
+
+      .logo {
+        font-family: var(--font-family-heading);
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--primary);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-icon {
+        width: 32px;
+        height: 32px;
+        fill: var(--primary);
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: var(--border-radius);
+        font-weight: 500;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: var(--transition);
+        border: none;
+        outline: none;
+        text-decoration: none;
+      }
+
+      .btn-primary {
+        background-color: var(--primary);
+        color: var(--white);
+      }
+
+      .btn-primary:hover {
+        background-color: var(--primary-dark);
+      }
+
+      .btn-icon {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+      }
+
+      /* Search and Filters */
+      .search-filters {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .search-input {
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--light-gray);
+        border-radius: var(--border-radius);
+        font-family: var(--font-family);
+        font-size: 0.875rem;
+        width: 100%;
+        transition: var(--transition);
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+
+      .filter-select {
+        padding: 0.75rem 2.5rem 0.75rem 1rem;
+        border: 1px solid var(--light-gray);
+        border-radius: var(--border-radius);
+        font-family: var(--font-family);
+        font-size: 0.875rem;
+        background-color: var(--white);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2364748b'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1.25rem;
+        appearance: none;
+        transition: var(--transition);
+      }
+
+      .filter-select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+
+      /* Dashboard */
+      .dashboard {
+        margin-bottom: 2rem;
+      }
+
+      .section-title {
+        font-family: var(--font-family-heading);
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--dark);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .section-title-icon {
+        width: 20px;
+        height: 20px;
+        fill: var(--primary);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .stat-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 1.5rem;
+        transition: var(--transition);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .stat-title {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--gray);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-trend {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-top: auto;
+      }
+
+      .trend-up {
+        color: var(--secondary);
+      }
+
+      .trend-down {
+        color: var(--danger);
+      }
+
+      .trend-icon {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+      }
+
+      /* Charts */
+      .charts-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .chart-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 1.5rem;
+        height: 100%;
+      }
+
+      .chart-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 1rem;
+      }
+
+      .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+      }
+
+      .pie-chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      /* Rooms Grid */
+      .rooms-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .room-card {
+        background-color: var(--card-bg);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        transition: var(--transition);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .room-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .room-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background-color: var(--primary-light);
+        border-bottom: 1px solid var(--light-gray);
+      }
+
+      .room-number {
+        font-weight: 700;
+        font-size: 1.125rem;
+        color: var(--primary);
+      }
+
+      .room-status {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .status-occupied {
+        background-color: var(--danger);
+        color: var(--white);
+      }
+
+      .status-partial {
+        background-color: var(--warning);
+        color: var(--white);
+      }
+
+      .status-vacant {
+        background-color: var(--secondary);
+        color: var(--white);
+      }
+
+      .room-image {
+        height: 160px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+      }
+
+      .room-image::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.3) 100%);
+      }
+
+      .room-details {
+        padding: 1rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .detail-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--gray);
+      }
+
+      .detail-icon {
+        width: 18px;
+        height: 18px;
+        fill: var(--gray);
+        flex-shrink: 0;
+        margin-top: 0.25rem;
+      }
+
+      .detail-content {
+        flex-grow: 1;
+      }
+
+      .detail-label {
+        font-weight: 500;
+        color: var(--dark);
+        margin-bottom: 0.25rem;
+      }
+
+      .room-actions {
+        padding: 1rem;
+        display: flex;
+        gap: 0.5rem;
+        border-top: 1px solid var(--light-gray);
+      }
+
+      .action-btn {
+        flex: 1;
+        padding: 0.5rem;
+        border-radius: var(--border-radius);
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: var(--transition);
+        border: none;
+        background-color: var(--primary);
+        color: var(--white);
+      }
+
+      .action-btn:hover {
+        background-color: var(--primary-dark);
+      }
+
+      .action-icon {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+      }
+
+      /* Bottom Navigation */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color:white;
+        box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+        display: flex;
+        z-index: 100;
+      }
+
+      .nav-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  padding: 8px ;
+  padding-inline: 300px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  color:var(--primary) ;
+
+}
+
+.nav-button svg {
+  margin-bottom: 2px;
+}
+.bottom-nav .nav-button:hover {
+        background: rgb(0, 110, 255);
+        color: white;
+      }
+      .nav-item.active {
+        color: blue;
+
+      }
+
+      .nav-button.nav-item.active {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+    
+      }
+
+      /* Loading Skeleton */
+      .skeleton {
+        background: linear-gradient(
+          90deg,
+          rgba(226, 232, 240, 0.6) 25%,
+          rgba(226, 232, 240, 0.9) 50%,
+          rgba(226, 232, 240, 0.6) 75%
+        );
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+        border-radius: var(--border-radius);
+      }
+
+      @keyframes loading {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      .skeleton-room {
+        height: 400px;
+      }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
+        .charts-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .search-filters {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-container">
+        <a href="/" class="logo">
+          <!-- <svg class="logo-icon" viewBox="0 0 24 24">
+            <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
+          </svg> -->
+          mytenants.in
+        </a>
+        <div class="header-actions">
+          <button id="exportBtn" class="btn btn-primary">
+            <svg class="btn-icon" viewBox="0 0 24 24">
+              <path d="M14,2H6C4.89,2 4,2.89 4,4V20C4,21.11 4.89,22 6,22H18C19.11,22 20,21.11 20,20V8L14,2M18,20H6V4H13V9H18V20M10,19L12,15H9V10H15V15H12L14,19H10Z" />
+            </svg>
+            Export to CSV
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="container">
+        <!-- Search and Filters -->
+        <div class="search-filters">
+          <input
+            type="text"
+            id="searchInput"
+            class="search-input"
+            placeholder="Search by room number or tenant name..."
+          />
+          <select id="occupancyFilter" class="filter-select">
+            <option value="">All Rooms</option>
+            <option value="Fully Occupied">Fully Occupied</option>
+            <option value="Partially Occupied">Partially Occupied</option>
+            <option value="Vacant">Vacant</option>
+          </select>
+        </div>
+
+        <!-- Dashboard -->
+        <section class="dashboard">
+          <h2 class="section-title">
+            <svg class="section-title-icon" viewBox="0 0 24 24">
+              <path d="M3,13H11V3H3M3,21H11V15H3M13,21H21V11H13M13,3V9H21V3" />
+            </svg>
+            Dashboard Overview
+          </h2>
+
+          <!-- Stats Cards -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-title">Total Tenants</div>
+              <div class="stat-value" id="totalTenants">0</div>
+              <div class="stat-trend trend-up">
+                <svg class="trend-icon" viewBox="0 0 24 24">
+                  <path d="M7 14l5-5 5 5z" />
+                </svg>
+                <span id="tenantsTrend">0% from last month</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title">Total Revenue</div>
+              <div class="stat-value" id="totalRevenue">₹0</div>
+              <div class="stat-trend trend-up">
+                <svg class="trend-icon" viewBox="0 0 24 24">
+                  <path d="M7 14l5-5 5 5z" />
+                </svg>
+                <span id="revenueTrend">0% from last month</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-title">Pending Rent</div>
+              <div class="stat-value" id="pendingRent">₹0</div>
+              <div class="stat-trend trend-down">
+                <svg class="trend-icon" viewBox="0 0 24 24">
+                  <path d="M7 10l5 5 5-5z" />
+                </svg>
+                <span id="pendingTrend">0% from last month</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="charts-grid">
+            <div class="chart-card">
+              <h3 class="chart-title">Revenue & Occupancy Trends</h3>
+              <div class="chart-container">
+                <canvas id="trendsChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <h3 class="chart-title">Room Occupancy Status</h3>
+              <div class="pie-chart-container">
+                <canvas id="occupancyChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Rooms Section -->
+        <section>
+          <h2 class="section-title">
+            <svg class="section-title-icon" viewBox="0 0 24 24">
+              <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
+            </svg>
+            Rooms & Tenants
+          </h2>
+          <div id="roomsGrid" class="rooms-grid">
+            <!-- Rooms will be loaded here -->
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a class='nav-button' href='allocate.html'>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+          </svg>
+          Allocate
+        </a>
+        <a class='nav-button active' href='index.html'>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z"/>
+          </svg>
+          Home
+        </a>
+        <a class='nav-button' href='rent.html'>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M11.8,10.9c-2.27-0.59-3-1.2-3-2.15c0-1.09,1.01-1.85,2.7-1.85c1.78,0,2.44,0.85,2.5,2.1h2.21c-0.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94,0.42-3.5,1.68-3.5,3.61c0,2.31,1.91,3.46,4.7,4.13c2.5,0.6,3,1.48,3,2.41c0,0.69-0.49,1.79-2.7,1.79c-2.06,0-2.87-0.92-2.98-2.1h-2.2c0.12,2.19,1.76,3.42,3.68,3.83V21h3v-2.15c1.95-0.37,3.5-1.5,3.5-3.55C16.5,12.46,14.07,11.49,11.8,10.9z"/>
+          </svg>
+          Rent
+        </a>
+      </nav>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        get,
+        onValue
+      } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyBEX5lj5VRhmlxAhHskQJVB1G6uoVEVvmQ",
+        authDomain: "diamoundbhai.firebaseapp.com",
+        projectId: "diamoundbhai",
+        storageBucket: "diamoundbhai.appspot.com",
+        messagingSenderId: "236932120968",
+        appId: "1:236932120968:web:a3d9ec830d48757024fa3d",
+        measurementId: "G-MK06SH1QNL",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+
+      // DOM Elements
+      const searchInput = document.getElementById("searchInput");
+      const occupancyFilter = document.getElementById("occupancyFilter");
+      const roomsGrid = document.getElementById("roomsGrid");
+      const exportBtn = document.getElementById("exportBtn");
+      
+      // Stats Elements
+      const totalTenantsEl = document.getElementById("totalTenants");
+      const totalRevenueEl = document.getElementById("totalRevenue");
+      const pendingRentEl = document.getElementById("pendingRent");
+      const tenantsTrendEl = document.getElementById("tenantsTrend");
+      const revenueTrendEl = document.getElementById("revenueTrend");
+      const pendingTrendEl = document.getElementById("pendingTrend");
+
+      // Default room image URL
+      const roomImage = "https://websiteupload.s3.ap-south-1.amazonaws.com/2024/05/tips-to-keep-your-pg-room-clean.jpg";
+
+      // Charts
+      let trendsChart;
+      let occupancyChart;
+
+      // Show loading skeletons
+      function showLoading() {
+        roomsGrid.innerHTML = Array(6)
+          .fill(
+            `<div class="skeleton skeleton-room"></div>`
+          )
+          .join("");
+      }
+
+      // Initialize Trends Chart
+      function initTrendsChart() {
+        const ctx = document.getElementById('trendsChart').getContext('2d');
+        
+        // Sample data - will be replaced with real data
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+        const tenantData = [12, 15, 18, 22, 25, 30];
+        const revenueData = [60000, 75000, 90000, 110000, 125000, 150000];
+        
+        trendsChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: months,
+            datasets: [
+              {
+                label: 'Tenants',
+                data: tenantData,
+                borderColor: '#2563eb',
+                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true,
+                yAxisID: 'y',
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: '#2563eb',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+              },
+              {
+                label: 'Revenue (₹)',
+                data: revenueData,
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 2,
+                tension: 0.4,
+                fill: true,
+                yAxisID: 'y1',
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: '#10b981',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  font: {
+                    family: 'Poppins',
+                    size: 12,
+                    weight: '500'
+                  },
+                  padding: 20
+                }
+              },
+              tooltip: {
+                mode: 'index',
+                intersect: false,
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                titleColor: '#1e293b',
+                bodyColor: '#1e293b',
+                borderColor: '#e2e8f0',
+                borderWidth: 1,
+                padding: 12,
+                boxPadding: 6,
+                usePointStyle: true,
+                titleFont: {
+                  family: 'Poppins',
+                  size: 14,
+                  weight: '600'
+                },
+                bodyFont: {
+                  family: 'Poppins',
+                  size: 13
+                },
+                callbacks: {
+                  label: function(context) {
+                    let label = context.dataset.label || '';
+                    if (label) {
+                      label += ': ';
+                    }
+                    if (context.datasetIndex === 1) {
+                      label += '₹' + context.parsed.y.toLocaleString();
+                    } else {
+                      label += context.parsed.y;
+                    }
+                    return label;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: {
+                  display: false
+                },
+                ticks: {
+                  font: {
+                    family: 'Poppins',
+                    size: 12
+                  }
+                }
+              },
+              y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                title: {
+                  display: true,
+                  text: 'Tenants',
+                  font: {
+                    family: 'Poppins',
+                    size: 12,
+                    weight: '500'
+                  }
+                },
+                ticks: {
+                  font: {
+                    family: 'Poppins',
+                    size: 12
+                  }
+                },
+                grid: {
+                  color: 'rgba(226, 232, 240, 0.5)'
+                }
+              },
+              y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                grid: {
+                  drawOnChartArea: false,
+                  color: 'rgba(226, 232, 240, 0.5)'
+                },
+                title: {
+                  display: true,
+                  text: 'Revenue (₹)',
+                  font: {
+                    family: 'Poppins',
+                    size: 12,
+                    weight: '500'
+                  }
+                },
+                ticks: {
+                  font: {
+                    family: 'Poppins',
+                    size: 12
+                  },
+                  callback: function(value) {
+                    if (value >= 1000) {
+                      return '₹' + (value/1000) + 'K';
+                    }
+                    return '₹' + value;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Initialize Occupancy Pie Chart
+      function initOccupancyChart(fullyOccupied, partiallyOccupied, vacant) {
+        const ctx = document.getElementById('occupancyChart').getContext('2d');
+        
+        occupancyChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Fully Occupied', 'Partially Occupied', 'Vacant'],
+            datasets: [{
+              data: [fullyOccupied, partiallyOccupied, vacant],
+              backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
+              borderColor: '#ffffff',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  font: {
+                    family: 'Poppins',
+                    size: 12
+                  },
+                  padding: 20
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                titleColor: '#1e293b',
+                bodyColor: '#1e293b',
+                borderColor: '#e2e8f0',
+                borderWidth: 1,
+                padding: 12,
+                boxPadding: 6,
+                usePointStyle: true,
+                titleFont: {
+                  family: 'Poppins',
+                  size: 14,
+                  weight: '600'
+                },
+                bodyFont: {
+                  family: 'Poppins',
+                  size: 13
+                }
+              }
+            },
+            cutout: '60%'
+          }
+        });
+      }
+
+      // Update dashboard stats
+      function updateDashboardStats(rooms) {
+        let totalTenants = 0;
+        let totalRevenue = 0;
+        let rentPaid = 0;
+        let fullyOccupied = 0;
+        let partiallyOccupied = 0;
+        let vacant = 0;
+        
+        // Process room data
+        for (const roomNumber in rooms) {
+          const room = rooms[roomNumber];
+          
+          // Count tenants
+          if (room.tenants && Array.isArray(room.tenants)) {
+            totalTenants += room.tenants.length;
+          }
+          
+          // Calculate revenue
+          if (room.rent) {
+            totalRevenue += parseFloat(room.rent);
+          } else if (room.tenants && room.tenants.length > 0) {
+            // Assume default rent of 5000 per tenant if not specified
+            totalRevenue += room.tenants.length * 5000;
+          }
+          
+          // Calculate rent paid
+          if (room.rentPaid) {
+            rentPaid += parseFloat(room.rentPaid);
+          }
+          
+          // Count room occupancy status
+          if (room.occupancyStatus === "Fully Occupied") {
+            fullyOccupied++;
+          } else if (room.occupancyStatus === "Partially Occupied") {
+            partiallyOccupied++;
+          } else {
+            vacant++;
+          }
+        }
+        
+        // Calculate pending rent
+        const pendingRent = totalRevenue - rentPaid;
+        
+        // Update UI
+        totalTenantsEl.textContent = totalTenants;
+        totalRevenueEl.textContent = `₹${totalRevenue.toLocaleString()}`;
+        pendingRentEl.textContent = `₹${pendingRent.toLocaleString()}`;
+        
+        // Sample trend data (in a real app, this would come from historical data)
+        tenantsTrendEl.textContent = "+12% from last month";
+        revenueTrendEl.textContent = "+8% from last month";
+        pendingTrendEl.textContent = "-5% from last month";
+        
+        // Update charts
+        updateTrendsChart(rooms);
+        
+        // Initialize or update occupancy chart
+        if (!occupancyChart) {
+          initOccupancyChart(fullyOccupied, partiallyOccupied, vacant);
+        } else {
+          occupancyChart.data.datasets[0].data = [fullyOccupied, partiallyOccupied, vacant];
+          occupancyChart.update();
+        }
+      }
+
+      // Update trends chart
+      function updateTrendsChart(rooms) {
+        // In a real application, you would fetch historical data from Firebase
+        // For this demo, we'll generate some realistic growth data
+        
+        // Get current month and generate last 6 months
+        const months = [];
+        const currentDate = new Date();
+        for (let i = 5; i >= 0; i--) {
+          const month = new Date(currentDate);
+          month.setMonth(currentDate.getMonth() - i);
+          months.push(month.toLocaleString('default', { month: 'short' }));
+        }
+        
+        // Generate tenant growth data (increasing trend)
+        const tenantData = [];
+        const currentTenants = parseInt(totalTenantsEl.textContent) || 30;
+        for (let i = 0; i < 6; i++) {
+          // Start with fewer tenants and gradually increase
+          const factor = 0.6 + (i * 0.08);
+          tenantData.push(Math.round(currentTenants * factor));
+        }
+        
+        // Generate revenue growth data
+        const revenueData = [];
+        const currentRevenue = parseInt(totalRevenueEl.textContent.replace('₹', '').replace(/,/g, '')) || 150000;
+        for (let i = 0; i < 6; i++) {
+          // Start with less revenue and gradually increase
+          const factor = 0.5 + (i * 0.1);
+          revenueData.push(Math.round(currentRevenue * factor));
+        }
+        
+        // Update chart data
+        trendsChart.data.labels = months;
+        trendsChart.data.datasets[0].data = tenantData;
+        trendsChart.data.datasets[1].data = revenueData;
+        trendsChart.update();
+      }
+
+      // Fetch and display rooms
+      async function searchRooms() {
+        const searchQuery = searchInput.value.toLowerCase();
+        const occupancyValue = occupancyFilter.value;
+        showLoading();
+        roomsGrid.innerHTML = "";
+        let foundCount = 0;
+
+        try {
+          // Get allocated rooms from Firebase
+          const snapshot = await get(ref(database, "rooms/"));
+          const allocatedRooms = snapshot.exists() ? snapshot.val() : {};
+
+          // Update dashboard stats with the fetched data
+          updateDashboardStats(allocatedRooms);
+
+          // Generate all possible rooms (floors 1 to 6, rooms 01-10)
+          const allRooms = [];
+          for (let floor = 1; floor <= 6; floor++) {
+            for (let r = 1; r <= 10; r++) {
+              const roomNumber = `${floor}${r < 10 ? "0" + r : r}`;
+              allRooms.push({ roomNumber, floor });
+            }
+          }
+
+          allRooms.forEach((roomObj) => {
+            const roomNumber = roomObj.roomNumber;
+            // If the room exists in Firebase, use its data; otherwise, use default vacant values.
+            let roomData = allocatedRooms[roomNumber]
+              ? allocatedRooms[roomNumber]
+              : {
+                  occupancyStatus: "Vacant",
+                  tenants: [],
+                  contactNumbers: [],
+                  moveInDate: "",
+                  lastRentPaid: "",
+                  image: roomImage,
+                };
+
+            // Create a string from tenants for search matching.
+            const tenantsStr =
+              roomData.tenants && roomData.tenants.length > 0
+                ? roomData.tenants.join(", ").toLowerCase()
+                : "";
+                
+            // Check if the room matches the search query.
+            if (
+              roomNumber.toLowerCase().includes(searchQuery) ||
+              tenantsStr.includes(searchQuery)
+            ) {
+              // If an occupancy filter is applied, filter accordingly.
+              if (
+                !occupancyValue ||
+                roomData.occupancyStatus === occupancyValue
+              ) {
+                const card = createRoomCard(roomNumber, roomData);
+                roomsGrid.appendChild(card);
+                foundCount++;
+              }
+            }
+          });
+
+          if (foundCount === 0) {
+            roomsGrid.innerHTML = `<div class="no-results">No rooms found matching your search criteria.</div>`;
+          }
+        } catch (error) {
+          console.error("Error fetching rooms:", error);
+          roomsGrid.innerHTML = `<div class="error-message">Error loading rooms. Please try again later.</div>`;
+        }
+      }
+
+      // Create room card
+      function createRoomCard(roomNumber, roomData) {
+        const card = document.createElement("div");
+        card.className = "room-card";
+        
+        // Determine status class
+        let statusClass = "";
+        if (roomData.occupancyStatus === "Fully Occupied") {
+          statusClass = "status-occupied";
+        } else if (roomData.occupancyStatus === "Partially Occupied") {
+          statusClass = "status-partial";
+        } else {
+          statusClass = "status-vacant";
+        }
+        
+        card.innerHTML = `
+          <div class="room-header">
+            <div class="room-number">${roomNumber}</div>
+            <div class="room-status ${statusClass}">${roomData.occupancyStatus}</div>
+          </div>
+          <div class="room-image" style="background-image: url('${roomData.image || roomImage}')"></div>
+          <div class="room-details">
+            <div class="detail-item">
+              <svg class="detail-icon" viewBox="0 0 24 24">
+                <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+              </svg>
+              <div class="detail-content">
+                <div class="detail-label">Tenants</div>
+                ${
+                  roomData.tenants && roomData.tenants.length
+                    ? roomData.tenants.join(", ")
+                    : "No tenants"
+                }
+              </div>
+            </div>
+            <div class="detail-item">
+              <svg class="detail-icon" viewBox="0 0 24 24">
+                <path d="M19,19H5V8H19M16,1V3H8V1H6V3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3H18V1M17,12H12V17H17V12Z"/>
+              </svg>
+              <div class="detail-content">
+                <div class="detail-label">Arrival Date</div>
+                ${roomData.moveInDate || "N/A"}
+              </div>
+            </div>
+            <div class="detail-item">
+              <svg class="detail-icon" viewBox="0 0 24 24">
+                <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+              </svg>
+              <div class="detail-content">
+                <div class="detail-label">Last Rent Paid Date</div>
+                ${roomData.lastRentPaid || "N/A"}
+              </div>
+            </div>
+          </div>
+          <div class="room-actions">
+            ${roomData.contactNumbers && roomData.contactNumbers
+              .map(
+                (num, i) => `
+              <button class="action-btn call-btn" data-number="${num}">
+                <svg class="action-icon" viewBox="0 0 24 24">
+                  <path d="M6.62,10.79C8.06,13.62,10.38,15.94,13.21,17.38L15.41,15.18C15.69,14.9,16.08,14.82,16.43,14.93C17.55,15.3,18.75,15.5,20,15.5A1,1 0 0,1 21,16.5V20A1,1 0 0,1 20,21A17,17 0 0,1 3,4A1,1 0 0,1 4,3H7.5A1,1 0 0,1 8.5,4C8.5,5.25,8.7,6.45,9.07,7.57C9.18,7.92,9.1,8.31,8.82,8.59L6.62,10.79Z"/>
+                </svg>
+                Call Tenant ${i + 1}
+              </button>
+            `
+              )
+              .join("")}
+          </div>
+        `;
+        
+        // Add event listeners to call buttons
+        card.querySelectorAll(".call-btn").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const number = btn.dataset.number;
+            if (confirm(`Initiate call to ${number}?`)) {
+              window.location.href = `tel:${number}`;
+            }
+          });
+        });
+        
+        return card;
+      }
+
+      // Export data to CSV
+      function exportToCSV(rooms) {
+        // Create CSV header
+        let csvContent = "Room Number,Occupancy Status,Tenants,Contact Numbers,Arrival Date,Last Rent Paid Date,Rent Amount\n";
+        
+        // Add room data
+        let totalRevenue = 0;
+        let totalTenants = 0;
+        
+        for (const roomNumber in rooms) {
+          const room = rooms[roomNumber];
+          const tenants = room.tenants && room.tenants.length ? room.tenants.join("; ") : "";
+          const contactNumbers = room.contactNumbers && room.contactNumbers.length ? room.contactNumbers.join("; ") : "";
+          const moveInDate = room.moveInDate || "";
+          const lastRentPaid = room.lastRentPaid || "";
+          const rent = room.rent || (room.tenants && room.tenants.length ? room.tenants.length * 5000 : 0);
+          
+          // Add to totals
+          totalRevenue += parseFloat(rent);
+          if (room.tenants && Array.isArray(room.tenants)) {
+            totalTenants += room.tenants.length;
+          }
+          
+          // Add row to CSV
+          csvContent += `${roomNumber},"${room.occupancyStatus}","${tenants}","${contactNumbers}","${moveInDate}","${lastRentPaid}",${rent}\n`;
+        }
+        
+        // Add summary at the end
+        csvContent += "\n\nSUMMARY\n";
+        csvContent += `Total Tenants,${totalTenants}\n`;
+        csvContent += `Total Revenue,₹${totalRevenue}\n`;
+        
+        // Calculate pending rent (assuming 50% is paid for this example)
+        const rentPaid = totalRevenue * 0.5;
+        const pendingRent = totalRevenue - rentPaid;
+        csvContent += `Rent Paid,₹${rentPaid}\n`;
+        csvContent += `Pending Rent,₹${pendingRent}\n`;
+        
+        // Create download link
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `tms_data_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = "hidden";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      // Set up real-time listener for dashboard stats
+      function setupRealtimeListeners() {
+        const roomsRef = ref(database, "rooms/");
+        onValue(roomsRef, (snapshot) => {
+          const rooms = snapshot.exists() ? snapshot.val() : {};
+          updateDashboardStats(rooms);
+        });
+      }
+
+      // Initialize the application
+      function initApp() {
+        // Initialize charts
+        initTrendsChart();
+        
+        // Set up real-time listeners
+        setupRealtimeListeners();
+        
+        // Load initial data
+        searchRooms();
+        
+        // Set up export button
+        exportBtn.addEventListener("click", async () => {
+          try {
+            const snapshot = await get(ref(database, "rooms/"));
+            const rooms = snapshot.exists() ? snapshot.val() : {};
+            exportToCSV(rooms);
+          } catch (error) {
+            console.error("Error exporting data:", error);
+            alert("Failed to export data. Please try again.");
+          }
+        });
+      }
+
+      // Event listeners
+      searchInput.addEventListener("input", searchRooms);
+      occupancyFilter.addEventListener("change", searchRooms);
+      window.addEventListener("DOMContentLoaded", initApp);
+
+      // Initialize the bottom nav
+      const navItems = document.querySelectorAll(".nav-item");
+      navItems.forEach(item => {
+        item.addEventListener("click", (e) => {
+          // In a real app, this would navigate to the page
+          // For this demo, just update the active state
+          if (!e.currentTarget.href.includes('#')) {
+            e.preventDefault();
+            navItems.forEach(nav => nav.classList.remove("active"));
+            e.currentTarget.classList.add("active");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
