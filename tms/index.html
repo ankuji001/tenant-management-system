@@ -11,527 +11,595 @@
     <!-- Chart.js for the graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-      :root {
-        --primary: #2563eb;
-        --primary-dark: #1d4ed8;
-        --primary-light: #dbeafe;
-        --secondary: #10b981;
-        --secondary-dark: #059669;
-        --danger: #ef4444;
-        --warning: #f59e0b;
-        --dark: #1e293b;
-        --gray: #64748b;
-        --light-gray: #e2e8f0;
-        --white: #ffffff;
-        --body-bg: #f8fafc;
-        --card-bg: #ffffff;
-        --border-radius: 0.5rem;
-        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        --font-family: 'Poppins', sans-serif;
-        --font-family-heading: 'Montserrat', sans-serif;
-        --transition: all 0.3s ease;
-      }
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family: var(--font-family);
-        background-color: var(--body-bg);
-        color: var(--dark);
-        min-height: 100vh;
-        line-height: 1.6;
-        padding-bottom: 70px;
-      }
-
-      /* Layout */
-      .container {
-        width: 100%;
-        padding: 0 1rem;
-      }
-
-      .main-content {
-        margin-top: 70px;
-        padding: 1.5rem 0;
-      }
-
-      /* Header */
-      .header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background-color: var(--white);
-        box-shadow: var(--shadow);
-        z-index: 100;
-        height: 70px;
-      }
-
-      .header-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 100%;
-        padding: 0 1.5rem;
-      }
-
-      .logo {
-        font-family: var(--font-family-heading);
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: var(--primary);
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .logo-icon {
-        width: 32px;
-        height: 32px;
-        fill: var(--primary);
-      }
-
-      .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: var(--border-radius);
-        font-weight: 500;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: var(--transition);
-        border: none;
-        outline: none;
-        text-decoration: none;
-      }
-
-      .btn-primary {
-        background-color: var(--primary);
-        color: var(--white);
-      }
-
-      .btn-primary:hover {
-        background-color: var(--primary-dark);
-      }
-
-      .btn-icon {
-        width: 18px;
-        height: 18px;
-        fill: currentColor;
-      }
-
-      /* Search and Filters */
-      .search-filters {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-      }
-
-      .search-input {
-        padding: 0.75rem 1rem;
-        border: 1px solid var(--light-gray);
-        border-radius: var(--border-radius);
-        font-family: var(--font-family);
-        font-size: 0.875rem;
-        width: 100%;
-        transition: var(--transition);
-      }
-
-      .search-input:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-      }
-
-      .filter-select {
-        padding: 0.75rem 2.5rem 0.75rem 1rem;
-        border: 1px solid var(--light-gray);
-        border-radius: var(--border-radius);
-        font-family: var(--font-family);
-        font-size: 0.875rem;
-        background-color: var(--white);
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2364748b'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 0.75rem center;
-        background-size: 1.25rem;
-        appearance: none;
-        transition: var(--transition);
-      }
-
-      .filter-select:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-      }
-
-      /* Dashboard */
-      .dashboard {
-        margin-bottom: 2rem;
-      }
-
-      .section-title {
-        font-family: var(--font-family-heading);
-        font-size: 1.25rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-        color: var(--dark);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .section-title-icon {
-        width: 20px;
-        height: 20px;
-        fill: var(--primary);
-      }
-
-      .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-      }
-
-      .stat-card {
-        background-color: var(--card-bg);
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow);
-        padding: 1.5rem;
-        transition: var(--transition);
-        display: flex;
-        flex-direction: column;
-      }
-
-      .stat-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-lg);
-      }
-
-      .stat-title {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: var(--gray);
-        margin-bottom: 0.5rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-      }
-
-      .stat-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: var(--dark);
-        margin-bottom: 0.5rem;
-      }
-
-      .stat-trend {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        margin-top: auto;
-      }
-
-      .trend-up {
-        color: var(--secondary);
-      }
-
-      .trend-down {
-        color: var(--danger);
-      }
-
-      .trend-icon {
-        width: 16px;
-        height: 16px;
-        fill: currentColor;
-      }
-
-      /* Charts */
-      .charts-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-      }
-
-      .chart-card {
-        background-color: var(--card-bg);
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow);
-        padding: 1.5rem;
-        height: 100%;
-      }
-
-      .chart-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--dark);
-        margin-bottom: 1rem;
-      }
-
-      .chart-container {
-        position: relative;
-        height: 300px;
-        width: 100%;
-      }
-
-      .pie-chart-container {
-        position: relative;
-        height: 300px;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-
-      /* Rooms Grid */
-      .rooms-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 1.5rem;
-      }
-
-      .room-card {
-        background-color: var(--card-bg);
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow);
-        overflow: hidden;
-        transition: var(--transition);
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .room-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-lg);
-      }
-
-      .room-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        background-color: var(--primary-light);
-        border-bottom: 1px solid var(--light-gray);
-      }
-
-      .room-number {
-        font-weight: 700;
-        font-size: 1.125rem;
-        color: var(--primary);
-      }
-
-      .room-status {
-        font-size: 0.75rem;
-        font-weight: 600;
-        padding: 0.25rem 0.75rem;
-        border-radius: 9999px;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-      }
-
-      .status-occupied {
-        background-color: var(--danger);
-        color: var(--white);
-      }
-
-      .status-partial {
-        background-color: var(--warning);
-        color: var(--white);
-      }
-
-      .status-vacant {
-        background-color: var(--secondary);
-        color: var(--white);
-      }
-
-      .room-image {
-        height: 160px;
-        background-size: cover;
-        background-position: center;
-        position: relative;
-      }
-
-      .room-image::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.3) 100%);
-      }
-
-      .room-details {
-        padding: 1rem;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-      }
-
-      .detail-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.5rem;
-        font-size: 0.875rem;
-        color: var(--gray);
-      }
-
-      .detail-icon {
-        width: 18px;
-        height: 18px;
-        fill: var(--gray);
-        flex-shrink: 0;
-        margin-top: 0.25rem;
-      }
-
-      .detail-content {
-        flex-grow: 1;
-      }
-
-      .detail-label {
-        font-weight: 500;
-        color: var(--dark);
-        margin-bottom: 0.25rem;
-      }
-
-      .room-actions {
-        padding: 1rem;
-        display: flex;
-        gap: 0.5rem;
-        border-top: 1px solid var(--light-gray);
-      }
-
-      .action-btn {
-        flex: 1;
-        padding: 0.5rem;
-        border-radius: var(--border-radius);
-        font-size: 0.875rem;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        cursor: pointer;
-        transition: var(--transition);
-        border: none;
-        background-color: var(--primary);
-        color: var(--white);
-      }
-
-      .action-btn:hover {
-        background-color: var(--primary-dark);
-      }
-
-      .action-icon {
-        width: 16px;
-        height: 16px;
-        fill: currentColor;
-      }
-
-      /* Bottom Navigation */
-      .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color:white;
-        box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
-        display: flex;
-        z-index: 100;
-      }
-
-      .nav-button {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  text-decoration: none;
-  padding: 8px ;
-  padding-inline: 300px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  color:var(--primary) ;
-
-}
-
-.nav-button svg {
-  margin-bottom: 2px;
-}
-.bottom-nav .nav-button:hover {
-        background: rgb(0, 110, 255);
-        color: white;
-      }
-      .nav-item.active {
-        color: blue;
-
-      }
-
-      .nav-button.nav-item.active {
-        width: 20px;
-        height: 20px;
-        fill: currentColor;
+        :root {
+          --primary: #2563eb;
+          --primary-dark: #1d4ed8;
+          --primary-light: #dbeafe;
+          --secondary: #10b981;
+          --secondary-dark: #059669;
+          --danger: #ef4444;
+          --warning: #f59e0b;
+          --dark: #1e293b;
+          --gray: #64748b;
+          --light-gray: #e2e8f0;
+          --white: #ffffff;
+          --body-bg: #f8fafc;
+          --card-bg: #ffffff;
+          --border-radius: 0.5rem;
+          --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+          --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+            0 4px 6px -2px rgba(0, 0, 0, 0.05);
+          --font-family: 'Poppins', sans-serif;
+          --font-family-heading: 'Montserrat', sans-serif;
+          --transition: all 0.3s ease;
+        }
     
-      }
-
-      /* Loading Skeleton */
-      .skeleton {
-        background: linear-gradient(
-          90deg,
-          rgba(226, 232, 240, 0.6) 25%,
-          rgba(226, 232, 240, 0.9) 50%,
-          rgba(226, 232, 240, 0.6) 75%
-        );
-        background-size: 200% 100%;
-        animation: loading 1.5s infinite;
-        border-radius: var(--border-radius);
-      }
-
-      @keyframes loading {
-        0% {
-          background-position: 200% 0;
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
         }
-        100% {
-          background-position: -200% 0;
+    
+        body {
+          font-family: var(--font-family);
+          background-color: var(--body-bg);
+          color: var(--dark);
+          min-height: 100vh;
+          line-height: 1.6;
+          padding-bottom: 70px;
         }
-      }
-
-      .skeleton-room {
-        height: 400px;
-      }
-
-      /* Responsive */
-      @media (max-width: 1024px) {
-        .charts-grid {
-          grid-template-columns: 1fr;
+    
+        /* Layout */
+        .container {
+          width: 100%;
+          padding: 0 1rem;
+          max-width: 1700px;
+          margin: 0 auto;
         }
-      }
-
-      @media (max-width: 768px) {
-        .stats-grid {
-          grid-template-columns: 1fr;
+    
+        .main-content {
+          margin-top: 70px;
+          padding: 1rem 0;
         }
-        
+    
+        /* Header */
+        .header {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          background-color: var(--white);
+          box-shadow: var(--shadow);
+          z-index: 100;
+          height: 70px;
+        }
+    
+        .header-container {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          height: 100%;
+          padding: 0 1rem;
+          max-width: 1700px;
+          margin: 0 auto;
+        }
+    
+        .logo {
+          font-family: var(--font-family-heading);
+          font-size: 1.5rem;
+          font-weight: 800;
+          color: var(--primary);
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+    
+        .header-actions {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+    
+        .btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          padding: 0.5rem 1rem;
+          border-radius: var(--border-radius);
+          font-weight: 500;
+          font-size: 0.875rem;
+          cursor: pointer;
+          transition: var(--transition);
+          border: none;
+          outline: none;
+          text-decoration: none;
+        }
+    
+        .btn-primary {
+          background-color: var(--primary);
+          color: var(--white);
+        }
+    
+        .btn-primary:hover {
+          background-color: var(--primary-dark);
+        }
+    
+        .btn-icon {
+          width: 18px;
+          height: 18px;
+          fill: currentColor;
+        }
+    
+        /* Search and Filters */
         .search-filters {
-          grid-template-columns: 1fr;
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 1rem;
+          margin-bottom: 1rem;
         }
-      }
-    </style>
+    
+        .search-input {
+          padding: 0.75rem 1rem;
+          border: 1px solid var(--light-gray);
+          border-radius: var(--border-radius);
+          font-family: var(--font-family);
+          font-size: 0.875rem;
+          width: 100%;
+          transition: var(--transition);
+        }
+    
+        .search-input:focus {
+          outline: none;
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+    
+        .filter-select {
+          padding: 0.75rem 2.5rem 0.75rem 1rem;
+          border: 1px solid var(--light-gray);
+          border-radius: var(--border-radius);
+          font-family: var(--font-family);
+          font-size: 0.875rem;
+          background-color: var(--white);
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2364748b'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 0.75rem center;
+          background-size: 1.25rem;
+          appearance: none;
+          transition: var(--transition);
+          width: 100%;
+        }
+    
+        .filter-select:focus {
+          outline: none;
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+    
+        /* Dashboard */
+        .dashboard {
+          margin-bottom: 1.5rem;
+          padding-left: 100px;
+          padding-right: 100px;
+        }
+
+    
+        .section-title {
+          font-family: var(--font-family-heading);
+          font-size: 1.25rem;
+          font-weight: 700;
+          margin-bottom: 1rem;
+          color: var(--dark);
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+    
+        .section-title-icon {
+          width: 20px;
+          height: 20px;
+          fill: var(--primary);
+        }
+    
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 1rem;
+          margin-bottom: 1rem;
+        }
+    
+        .stat-card {
+          background-color: var(--card-bg);
+          border-radius: var(--border-radius);
+          box-shadow: var(--shadow);
+          padding: 1rem;
+          transition: var(--transition);
+          display: flex;
+          flex-direction: column;
+        }
+    
+        .stat-card:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--shadow-lg);
+        }
+    
+        .stat-title {
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: var(--gray);
+          margin-bottom: 0.5rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+    
+        .stat-value {
+          font-size: 1.75rem;
+          font-weight: 700;
+          color: var(--dark);
+          margin-bottom: 0.5rem;
+        }
+    
+        .stat-trend {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+          font-size: 0.875rem;
+          font-weight: 500;
+          margin-top: auto;
+        }
+    
+        .trend-up {
+          color: var(--secondary);
+        }
+    
+        .trend-down {
+          color: var(--danger);
+        }
+    
+        .trend-icon {
+          width: 16px;
+          height: 16px;
+          fill: currentColor;
+        }
+    
+        /* Charts */
+        .charts-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+        }
+    
+        .chart-card {
+          background-color: var(--card-bg);
+          border-radius: var(--border-radius);
+          box-shadow: var(--shadow);
+          padding: 1rem;
+          height: 100%;
+        }
+    
+        .chart-title {
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--dark);
+          margin-bottom: 0.5rem;
+        }
+    
+        .chart-container,
+        .pie-chart-container {
+          position: relative;
+          width: 100%;
+          max-width: 100%;
+          height: auto;
+        }
+    
+        .chart-container canvas,
+        .pie-chart-container canvas {
+          width: 100% !important;
+          height: auto !important;
+        }
+    
+        /* Rooms Grid */
+        .rooms-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 1rem;
+        }
+    
+        .room-card {
+          background-color: var(--card-bg);
+          border-radius: var(--border-radius);
+          box-shadow: var(--shadow);
+          overflow: hidden;
+          transition: var(--transition);
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        }
+    
+        .room-card:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--shadow-lg);
+        }
+    
+        .room-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.75rem;
+          background-color: var(--primary-light);
+          border-bottom: 1px solid var(--light-gray);
+        }
+    
+        .room-number {
+          font-weight: 700;
+          font-size: 1rem;
+          color: var(--primary);
+        }
+    
+        .room-status {
+          font-size: 0.75rem;
+          font-weight: 600;
+          padding: 0.25rem 0.75rem;
+          border-radius: 9999px;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+    
+        .status-occupied {
+          background-color: var(--danger);
+          color: var(--white);
+        }
+    
+        .status-partial {
+          background-color: var(--warning);
+          color: var(--white);
+        }
+    
+        .status-vacant {
+          background-color: var(--secondary);
+          color: var(--white);
+        }
+    
+        .room-image {
+          height: 160px;
+          background-size: cover;
+          background-position: center;
+          position: relative;
+        }
+    
+        .room-image::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.3) 100%);
+        }
+    
+        .room-details {
+          padding: 0.75rem;
+          flex-grow: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+    
+        .detail-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.5rem;
+          font-size: 0.875rem;
+          color: var(--gray);
+        }
+    
+        .detail-icon {
+          width: 18px;
+          height: 18px;
+          fill: var(--gray);
+          flex-shrink: 0;
+          margin-top: 0.25rem;
+        }
+    
+        .detail-content {
+          flex-grow: 1;
+        }
+    
+        .detail-label {
+          font-weight: 500;
+          color: var(--dark);
+          margin-bottom: 0.25rem;
+        }
+    
+        .room-actions {
+          padding: 0.75rem;
+          display: flex;
+          gap: 0.5rem;
+          border-top: 1px solid var(--light-gray);
+          flex-wrap: wrap;
+        }
+    
+        .action-btn {
+          flex: 1 1 calc(50% - 0.5rem);
+          padding: 0.5rem;
+          border-radius: var(--border-radius);
+          font-size: 0.875rem;
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          cursor: pointer;
+          transition: var(--transition);
+          border: none;
+          background-color: var(--primary);
+          color: var(--white);
+          text-align: center;
+        }
+    
+        .action-btn:hover {
+          background-color: var(--primary-dark);
+        }
+    
+        .action-icon {
+          width: 16px;
+          height: 16px;
+          fill: currentColor;
+        }
+    
+        /* Bottom Navigation */
+        .bottom-nav {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          background-color: var(--white);
+          box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+          display: flex;
+          z-index: 100;
+        }
+    
+        .nav-button {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          text-decoration: none;
+          padding: 8px 0;
+          border-radius: 0;
+          transition: var(--transition);
+          color: var(--gray);
+          font-size: 0.75rem;
+        }
+    
+        .nav-button svg {
+          width: 20px;
+          height: 20px;
+          fill: currentColor;
+        }
+    
+        .bottom-nav .nav-button:hover {
+          background: rgba(37, 99, 235, 0.1);
+          color: var(--primary);
+        }
+    
+        .nav-button.active {
+          color: var(--primary);
+          font-weight: 600;
+        }
+    
+        /* Loading Skeleton */
+        .skeleton {
+          background: linear-gradient(
+            90deg,
+            rgba(226, 232, 240, 0.6) 25%,
+            rgba(226, 232, 240, 0.9) 50%,
+            rgba(226, 232, 240, 0.6) 75%
+          );
+          background-size: 200% 100%;
+          animation: loading 1.5s infinite;
+          border-radius: var(--border-radius);
+        }
+    
+        @keyframes loading {
+          0% {
+            background-position: 200% 0;
+          }
+          100% {
+            background-position: -200% 0;
+          }
+        }
+    
+        .skeleton-room {
+          height: 400px;
+        }
+    
+        /* Responsive */
+        @media (min-width: 768px) {
+          .charts-grid {
+            grid-template-columns: 2fr 1fr;
+          }
+
+          
+        }
+    
+        @media (max-width: 768px) {
+          .search-filters {
+            grid-template-columns: 1fr;
+          }
+    
+          .header-container {
+            padding: 0 0.5rem;
+          }
+    
+          .header {
+            height: 60px;
+          }
+    
+          .main-content {
+            margin-top: 60px;
+          }
+    
+          .room-actions {
+            padding: 0.5rem;
+          }
+    
+          .action-btn {
+            flex: 1 1 100%;
+          }
+    
+          .section-title {
+            font-size: 1rem;
+          }
+    
+          .stat-value {
+            font-size: 1.5rem;
+          }
+        }
+    
+        @media (max-width: 480px) {
+          .stat-card {
+            padding: 0.75rem;
+          }
+
+          .dashboard {
+          margin-bottom: 1.5rem;
+          padding-left: 10px;
+          padding-right: 10px;
+        }
+    
+          .stat-value {
+            font-size: 1.25rem;
+          }
+    
+          .section-title {
+            font-size: 0.9rem;
+          }
+    
+          .section-title-icon {
+            width: 18px;
+            height: 18px;
+          }
+    
+          .room-number {
+            font-size: 1rem;
+          }
+    
+          .detail-label {
+            font-size: 0.875rem;
+          }
+    
+          .room-details {
+            padding: 0.5rem;
+          }
+        }
+ 
+
+      </style>
   </head>
   <body>
     <!-- Header -->
@@ -556,23 +624,7 @@
 
     <!-- Main Content -->
     <main class="main-content">
-      <div class="container">
-        <!-- Search and Filters -->
-        <div class="search-filters">
-          <input
-            type="text"
-            id="searchInput"
-            class="search-input"
-            placeholder="Search by room number or tenant name..."
-          />
-          <select id="occupancyFilter" class="filter-select">
-            <option value="">All Rooms</option>
-            <option value="Fully Occupied">Fully Occupied</option>
-            <option value="Partially Occupied">Partially Occupied</option>
-            <option value="Vacant">Vacant</option>
-          </select>
-        </div>
-
+      
         <!-- Dashboard -->
         <section class="dashboard">
           <h2 class="section-title">
@@ -633,6 +685,24 @@
           </div>
         </section>
 
+        <div class="container">
+            <!-- Search and Filters -->
+            <div class="search-filters">
+              <input
+                type="text"
+                id="searchInput"
+                class="search-input"
+                placeholder="Search by room number or tenant name..."
+              />
+              <select id="occupancyFilter" class="filter-select">
+                <option value="">All Rooms</option>
+                <option value="Fully Occupied">Fully Occupied</option>
+                <option value="Partially Occupied">Partially Occupied</option>
+                <option value="Vacant">Vacant</option>
+              </select>
+            </div>
+    
+            
         <!-- Rooms Section -->
         <section>
           <h2 class="section-title">
