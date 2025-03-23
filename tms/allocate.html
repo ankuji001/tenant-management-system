@@ -1,83 +1,128 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Room Allocation</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Audiowide&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap"
+    rel="stylesheet"
+  />
   <style>
     :root {
-      --space-base: 1rem;
-      --primary-gradient: linear-gradient(135deg, #f9f9f9 0%, #e6e6e6 100%);
-      --accent-color: #4a90e2;
-      --accent-hover: #357abd;
-      --text-primary: #333333;
-      --text-secondary: #666666;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #dbeafe;
+      --secondary: #10b981;
+      --secondary-dark: #059669;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --dark: #1e293b;
+      --gray: #64748b;
+      --light-gray: #e2e8f0;
+      --white: #ffffff;
+      --body-bg: #f8fafc;
       --card-bg: #ffffff;
-      --border-radius: 12px;
-      --border-color: #e0e0e0;
-      --status-occupied: #ff6b6b;
-      --status-partial: #ffd166;
-      --status-vacant: #4ecdc4;
-      --input-bg: #ffffff;
-      --input-text: #333333;
-      --button-bg: var(--accent-color);
-      --button-hover: var(--accent-hover);
-      --font-display: "Audiowide", sans-serif;
-      --font-body: "Inter", sans-serif;
+      --border-radius: 0.5rem;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --font-family: 'Poppins', sans-serif;
       --font-family-heading: 'Montserrat', sans-serif;
+      --transition: all 0.3s ease;
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      scroll-behavior: smooth; /* Enable smooth scrolling for the entire page */
+      scroll-behavior: smooth;
     }
 
     body {
-      font-family: var(--font-body);
-      background: var(--primary-gradient);
-      color: var(--text-primary);
+      font-family: var(--font-family);
+      background-color: var(--body-bg);
+      color: var(--dark);
       min-height: 100vh;
       line-height: 1.6;
+      padding-bottom: 70px;
     }
 
-    header {
-      background: rgba(255, 255, 255, 0.9);
-      padding: var(--space-base) 0;
-      backdrop-filter: blur(12px);
+    .header {
       position: fixed;
-      width: 100%;
       top: 0;
+      left: 0;
+      width: 100%;
+      background-color: var(--white);
+      box-shadow: var(--shadow);
       z-index: 100;
-      border-bottom: 1px solid var(--border-color);
+      height: 70px;
     }
 
-    .header-content {
+    .header-container {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      max-width: 1200px;
+      align-items: center;
+      height: 100%;
+      padding: 0 1rem;
+      max-width: 1700px;
       margin: 0 auto;
-      padding: 0 var(--space-base);
     }
 
     .logo {
-        font-family: var(--font-family-heading);
-        font-size: 1.5rem;
-        font-weight: 800;
-        color:#2563EB;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
+      font-family: var(--font-family-heading);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      outline: none;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .btn-icon {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
     .allocation-container {
       max-width: 1200px;
-      margin: 80px auto 150px;
-      padding: 0 var(--space-base);
+      margin: 100px auto 2rem;
+      padding: 0 1rem;
     }
 
     /* Room Grid Styling */
@@ -91,35 +136,35 @@
     .room-box {
       background: var(--card-bg);
       border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--light-gray);
       padding: 1rem;
       text-align: center;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: var(--transition);
       position: relative;
       overflow: hidden;
     }
 
     .room-box:hover {
       transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow-lg);
     }
 
     .room-box.selected {
-      border: 2px solid var(--accent-color);
-      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25);
+      border: 2px solid var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
     }
 
     .room-box.vacant {
-      background: linear-gradient(135deg, var(--status-vacant) 0%, rgba(78, 205, 196, 0.7) 100%);
+      background: linear-gradient(135deg, var(--secondary) 0%, rgba(16, 185, 129, 0.7) 100%);
     }
 
     .room-box.partial {
-      background: linear-gradient(135deg, var(--status-partial) 0%, rgba(255, 209, 102, 0.7) 100%);
+      background: linear-gradient(135deg, var(--warning) 0%, rgba(245, 158, 11, 0.7) 100%);
     }
 
     .room-box.occupied {
-      background: linear-gradient(135deg, var(--status-occupied) 0%, rgba(255, 107, 107, 0.7) 100%);
+      background: linear-gradient(135deg, var(--danger) 0%, rgba(239, 68, 68, 0.7) 100%);
     }
 
     .room-number {
@@ -146,19 +191,19 @@
       font-size: 1.2rem;
       font-weight: 600;
       margin: 1.5rem 0 0.5rem;
-      color: var(--text-secondary);
-      border-bottom: 1px solid var(--border-color);
+      color: var(--gray);
+      border-bottom: 1px solid var(--light-gray);
       padding-bottom: 0.5rem;
     }
 
     form {
       background: var(--card-bg);
       border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      backdrop-filter: blur(8px);
+      border: 1px solid var(--light-gray);
+      box-shadow: var(--shadow);
       padding: 2rem;
       margin-top: 2rem;
-      scroll-margin-top: 100px; /* Add space above the form when scrolled to */
+      scroll-margin-top: 100px;
     }
 
     .form-grid {
@@ -175,7 +220,7 @@
     label {
       display: block;
       margin-bottom: 0.5rem;
-      color: var(--text-secondary);
+      color: var(--gray);
       font-size: 0.9rem;
     }
 
@@ -184,83 +229,77 @@
     button {
       width: 100%;
       padding: 12px 16px;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      background: var(--card-bg);
-      color: var(--input-text);
+      border: 1px solid var(--light-gray);
+      border-radius: var(--border-radius);
+      background: var(--white);
+      color: var(--dark);
       font-size: 1rem;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: var(--transition);
     }
 
     input:focus,
     select:focus {
       outline: none;
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
     }
 
     button {
-      background: #2563EB;
-      color: white;
+      background: var(--primary);
+      color: var(--white);
       border: none;
       cursor: pointer;
-      font-size: 15px;
-   
-      padding-bottom: 30px;
-      /* font-weight: 600; */
-      transition: all 0.3s ease;
-      height: 35px;
-      width: 150px;
+      font-weight: 500;
+      transition: var(--transition);
     }
 
     button:hover {
-      background: var(--accent-hover);
+      background: var(--primary-dark);
       transform: translateY(-2px);
     }
 
+    /* Bottom Navigation */
     .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color:white;
-        box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
-        display: flex;
-        z-index: 100;
-      }
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: var(--white);
+      box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+      display: flex;
+      z-index: 100;
+    }
 
-      .nav-button {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  text-decoration: none;
-  padding: 8px ;
-  padding-inline: 300px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  color:#2563EB ;
+    .nav-button {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-decoration: none;
+      padding: 8px 0;
+      border-radius: 0;
+      transition: var(--transition);
+      color: var(--gray);
+      font-size: 0.75rem;
+    }
 
-}
+    .nav-button svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
 
-.nav-button svg {
-  margin-bottom: 2px;
-}
-.bottom-nav .nav-button:hover {
-        background: rgb(0, 110, 255);
-        color: white;
-      }
-      .nav-item.active {
-        color: blue;
+    .bottom-nav .nav-button:hover {
+      background: rgba(37, 99, 235, 0.1);
+      color: var(--primary);
+    }
 
-      }
-
-      .nav-button.nav-item.active {
-        width: 20px;
-        height: 20px;
-        fill: currentColor;
-    
-      }
+    .nav-button.active {
+      color: var(--primary);
+      font-weight: 600;
+    }
 
     /* Popup Container */
     .popup {
@@ -268,10 +307,10 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #fff;
-      border-radius: 10px;
+      background: var(--white);
+      border-radius: var(--border-radius);
       padding: 25px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      box-shadow: var(--shadow-lg);
       z-index: 1000;
       display: none;
       text-align: center;
@@ -300,35 +339,35 @@
 
     /* Popup Button */
     .popup button {
-      background: #007bff;
+      background: var(--primary);
       color: white;
       border: none;
       padding: 12px 22px;
-      border-radius: 5px;
+      border-radius: var(--border-radius);
       cursor: pointer;
       font-size: 1rem;
-      transition: background 0.3s ease;
+      transition: var(--transition);
     }
 
     .popup button:hover {
-      background: #0056b3;
+      background: var(--primary-dark);
     }
 
     /* Vacant Button */
     .vacant-button {
-      background: #ff6b6b;
+      background: var(--danger);
       color: white;
       border: none;
       padding: 14px 24px;
-      border-radius: 8px;
+      border-radius: var(--border-radius);
       cursor: pointer;
       font-weight: 600;
-      transition: all 0.3s ease;
+      transition: var(--transition);
       margin-top: 1rem;
     }
 
     .vacant-button:hover {
-      background: #ff4c4c;
+      background: #e63e3e;
       transform: translateY(-2px);
     }
 
@@ -337,14 +376,14 @@
       font-size: 1.5rem;
       font-weight: 600;
       margin: 2rem 0 1rem;
-      color: var(--text-primary);
+      color: var(--dark);
     }
 
     /* Form Section */
     .form-section {
       margin-bottom: 2rem;
       padding-bottom: 1rem;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--light-gray);
     }
 
     .form-section:last-child {
@@ -353,9 +392,9 @@
 
     /* Highlight effect for form when scrolled to */
     @keyframes highlight-form {
-      0% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.4); }
-      70% { box-shadow: 0 0 0 10px rgba(74, 144, 226, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0); }
+      0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
     }
 
     .highlight-form {
@@ -371,86 +410,37 @@
       .form-grid {
         grid-template-columns: 1fr;
       }
-    }
-    .header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background-color: var(--white);
-        box-shadow: var(--shadow);
-        z-index: 100;
-        height: 70px;
-      }
-
+      
       .header-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 100%;
-        padding: 0 1.5rem;
+        padding: 0 0.5rem;
       }
 
-     
-
-      .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
+      .header {
+        height: 60px;
       }
 
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: var(--border-radius);
-        font-weight: 500;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: var(--transition);
-        border: none;
-        outline: none;
-        text-decoration: none;
+      .allocation-container {
+        margin-top: 80px;
       }
-
-      .btn-primary {
-        background-color: #1D4ED8;
-        color: var(--white);
-      }
-
-      .btn-primary:hover {
-        background-color: #1D4ED8;
-      }
-
-      .btn-icon {
-        width: 18px;
-        height: 18px;
-        fill: currentColor;
-      }
-
+    }
   </style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-container">
-          <a href="/" class="logo">
-            <!-- <svg class="logo-icon" viewBox="0 0 24 24">
-              <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
-            </svg> -->
-            mytenants.in
-          </a>
-          <div class="header-actions">
-            <button id="exportBtn" class="btn-btn-primary">
-              <svg class="btn-icon" viewBox="0 0 24 24">
-                <path d="M14,2H6C4.89,2 4,2.89 4,4V20C4,21.11 4.89,22 6,22H18C19.11,22 20,21.11 20,20V8L14,2M18,20H6V4H13V9H18V20M10,19L12,15H9V10H15V15H12L14,19H10Z" />
-              </svg>
-              Export to CSV
-            </button>
-          </div>
-        </div>
-      </header>
+  <header class="header">
+    <div class="header-container">
+      <a href="/" class="logo">
+        mytenants.in
+      </a>
+      <div class="header-actions">
+        <button id="exportBtn" class="btn btn-primary">
+          <svg class="btn-icon" viewBox="0 0 24 24">
+            <path d="M14,2H6C4.89,2 4,2.89 4,4V20C4,21.11 4.89,22 6,22H18C19.11,22 20,21.11 20,20V8L14,2M18,20H6V4H13V9H18V20M10,19L12,15H9V10H15V15H12L14,19H10Z" />
+          </svg>
+          Export to CSV
+        </button>
+      </div>
+    </div>
+  </header>
 
   <div class="allocation-container">
     <!-- Room Selection Grid -->
@@ -567,15 +557,15 @@
     <button id="closePopup">OK</button>
   </div>
 
-  <!-- Bottom Navigation Bar -->
+  <!-- Bottom Navigation -->
   <nav class="bottom-nav">
-    <a class='nav-button' href='allocate.html'>
+    <a class='nav-button active' href='allocate.html'>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
         <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
       </svg>
       Allocate
     </a>
-    <a class='nav-button active' href='index.html'>
+    <a class='nav-button' href='index.html'>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z"/>
       </svg>
@@ -588,6 +578,7 @@
       Rent
     </a>
   </nav>
+
   <script type="module">
     // Firebase Configuration
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
@@ -597,7 +588,7 @@
       apiKey: "AIzaSyBEX5lj5VRhmlxAhHskQJVB1G6uoVEVvmQ",
       authDomain: "diamoundbhai.firebaseapp.com",
       projectId: "diamoundbhai",
-      storageBucket: "diamoundbhai.appspot.com",
+      storageBucket: "diamoundbhai.firebasestorage.app",
       messagingSenderId: "236932120968",
       appId: "1:236932120968:web:a3d9ec830d48757024fa3d",
       measurementId: "G-MK06SH1QNL",
