@@ -3,32 +3,37 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Room Allocation</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap"
-    rel="stylesheet"
-  />
+  <title>Rent Management Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
+  <!-- Removed Chart.js script as it is no longer used -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <style>
     :root {
       --primary: #2563eb;
       --primary-dark: #1d4ed8;
       --primary-light: #dbeafe;
       --secondary: #10b981;
-      --secondary-dark: #059669;
+      --secondary-light: #d1fae5;
       --danger: #ef4444;
+      --danger-light: #fee2e2;
       --warning: #f59e0b;
-      --dark: #1e293b;
-      --gray: #64748b;
-      --light-gray: #e2e8f0;
-      --white: #ffffff;
-      --body-bg: #f8fafc;
-      --card-bg: #ffffff;
-      --border-radius: 0.5rem;
+      --warning-light: #fef3c7;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
       --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --radius: 0.5rem;
       --font-family: 'Poppins', sans-serif;
       --font-family-heading: 'Montserrat', sans-serif;
       --transition: all 0.3s ease;
@@ -38,24 +43,31 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      scroll-behavior: smooth;
     }
 
     body {
       font-family: var(--font-family);
-      background-color: var(--body-bg);
-      color: var(--dark);
+      background-color: var(--gray-50);
+      color: var(--gray-800);
+      line-height: 1.5;
       min-height: 100vh;
-      line-height: 1.6;
       padding-bottom: 70px;
     }
 
+    .container {
+      max-width: 1700px;
+      margin: 0 auto;
+      padding: 1.5rem;
+      
+    }
+
+    /* Header - Updated to match 1.html */
     .header {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      background-color: var(--white);
+      background-color: white;
       box-shadow: var(--shadow);
       z-index: 100;
       height: 70px;
@@ -94,7 +106,7 @@
       justify-content: center;
       gap: 0.5rem;
       padding: 0.5rem 1rem;
-      border-radius: var(--border-radius);
+      border-radius: var(--radius);
       font-weight: 500;
       font-size: 0.875rem;
       cursor: pointer;
@@ -106,7 +118,7 @@
 
     .btn-primary {
       background-color: var(--primary);
-      color: var(--white);
+      color: white;
     }
 
     .btn-primary:hover {
@@ -119,152 +131,304 @@
       fill: currentColor;
     }
 
-    .allocation-container {
-      max-width: 1200px;
-      margin: 100px auto 2rem;
-      padding: 0 1rem;
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--gray-300);
+      color: var(--gray-700);
     }
 
-    /* Room Grid Styling */
-    .room-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2rem;
+    .btn-outline:hover {
+      background-color: var(--gray-100);
     }
 
-    .room-box {
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      border: 1px solid var(--light-gray);
-      padding: 1rem;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--transition);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .room-box:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .room-box.selected {
-      border: 2px solid var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
-    }
-
-    .room-box.vacant {
-      background: linear-gradient(135deg, var(--secondary) 0%, rgba(16, 185, 129, 0.7) 100%);
-    }
-
-    .room-box.partial {
-      background: linear-gradient(135deg, var(--warning) 0%, rgba(245, 158, 11, 0.7) 100%);
-    }
-
-    .room-box.occupied {
-      background: linear-gradient(135deg, var(--danger) 0%, rgba(239, 68, 68, 0.7) 100%);
-    }
-
-    .room-number {
-      font-weight: 700;
-      font-size: 1.2rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .room-status {
-      font-size: 0.8rem;
-      font-weight: 600;
+    .btn-success {
+      background-color: var(--secondary);
       color: white;
-      padding: 3px 6px;
-      border-radius: 4px;
-      display: inline-block;
     }
 
-    .occupancy-icon {
-      margin-top: 0.5rem;
-      font-size: 1.5rem;
+    .btn-success:hover {
+      background-color: var(--secondary);
+      opacity: 0.9;
     }
 
-    .floor-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin: 1.5rem 0 0.5rem;
-      color: var(--gray);
-      border-bottom: 1px solid var(--light-gray);
-      padding-bottom: 0.5rem;
+    .btn-danger {
+      background-color: var(--danger);
+      color: white;
     }
 
-    form {
-      background: var(--card-bg);
-      border-radius: var(--border-radius);
-      border: 1px solid var(--light-gray);
+    .btn-danger:hover {
+      background-color: var(--danger);
+      opacity: 0.9;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 2rem;
-      margin-top: 2rem;
-      scroll-margin-top: 100px;
+      overflow: hidden;
+    ;
     }
 
-    .form-grid {
+    .card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .card-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .grid-cols-1 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 1.5rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
+     
     }
 
-    .form-group {
+    .stat-card {
+      background-color: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      margin-top: 100px;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-500);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-desc {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      margin-top: auto;
+    }
+
+    .date-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .date-selector select {
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-300);
+      font-size: 0.875rem;
+    }
+
+    .search-controls {
+      display: flex;
+      gap: 1rem;
       margin-bottom: 1.5rem;
     }
 
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: var(--gray);
-      font-size: 0.9rem;
+    .search-controls input,
+    .search-controls button {
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-300);
+      font-size: 0.875rem;
     }
 
-    input,
-    select,
-    button {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1px solid var(--light-gray);
-      border-radius: var(--border-radius);
-      background: var(--white);
-      color: var(--dark);
-      font-size: 1rem;
-      transition: var(--transition);
+    .search-controls input {
+      flex: 1;
     }
 
-    input:focus,
-    select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
-    }
-
-    button {
-      background: var(--primary);
-      color: var(--white);
+    .search-controls button {
+      background-color: var(--primary);
+      color: white;
       border: none;
       cursor: pointer;
       font-weight: 500;
-      transition: var(--transition);
     }
 
-    button:hover {
-      background: var(--primary-dark);
-      transform: translateY(-2px);
+    .search-controls button:hover {
+      background-color: var(--primary-dark);
     }
 
-    /* Bottom Navigation */
+    .tenant-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .tenant-card {
+      background-color: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .tenant-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .tenant-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .room-number {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .tenant-status {
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+    }
+
+    .status-paid {
+      background-color: var(--secondary-light);
+      color: var(--secondary);
+    }
+
+    .status-unpaid {
+      background-color: var(--danger-light);
+      color: var(--danger);
+    }
+
+    .tenant-body {
+      padding: 1.5rem;
+    }
+
+    .tenant-info {
+      margin-bottom: 1rem;
+    }
+
+    .tenant-info p {
+      margin-bottom: 0.5rem;
+      color: var(--gray-600);
+    }
+
+    .tenant-info p strong {
+      color: var(--gray-800);
+    }
+
+    .tenant-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .tenant-actions button {
+      flex: 1;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      color: var(--gray-500);
+    }
+
+    .spinner {
+      border: 3px solid var(--gray-200);
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin-right: 0.75rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      color: var(--gray-500);
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 1rem;
+      color: var(--gray-400);
+    }
+
+    .empty-state h3 {
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+    }
+
+    .error-message {
+      background-color: var(--danger-light);
+      color: var(--danger);
+      padding: 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .error-message svg {
+      margin-right: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    /* Bottom Navigation - Updated to match 1.html */
     .bottom-nav {
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-      background-color: var(--white);
+      background-color: white;
       box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
       display: flex;
       z-index: 100;
@@ -281,7 +445,7 @@
       padding: 8px 0;
       border-radius: 0;
       transition: var(--transition);
-      color: var(--gray);
+      color: var(--gray-500);
       font-size: 0.75rem;
     }
 
@@ -301,186 +465,23 @@
       font-weight: 600;
     }
 
-    /* Popup Container */
-    .popup {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: var(--white);
-      border-radius: var(--border-radius);
-      padding: 25px;
-      box-shadow: var(--shadow-lg);
-      z-index: 1000;
-      display: none;
-      text-align: center;
-      max-width: 400px;
-      width: 90%;
-    }
-
-    /* Popup Overlay */
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(5px);
-      z-index: 999;
-      display: none;
-    }
-
-    /* Popup Content */
-    .popup p {
-      font-size: 1.1rem;
-      margin-bottom: 25px;
-    }
-
-    /* Popup Button */
-    .popup button {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 12px 22px;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      font-size: 1rem;
-      transition: var(--transition);
-    }
-
-    .popup button:hover {
-      background: var(--primary-dark);
-    }
-
-    /* Vacant Button */
-    .vacant-button {
-      background: var(--danger);
-      color: white;
-      border: none;
-      padding: 14px 24px;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      font-weight: 600;
-      transition: var(--transition);
-      margin-top: 1rem;
-    }
-
-    .vacant-button:hover {
-      background: #e63e3e;
-      transform: translateY(-2px);
-    }
-
-    /* Section Title */
-    .section-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin: 2rem 0 1rem;
-      color: var(--dark);
-    }
-
-    /* Form Section */
-    .form-section {
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--light-gray);
-    }
-
-    .form-section:last-child {
-      border-bottom: none;
-    }
-
-    /* Highlight effect for form when scrolled to */
-    @keyframes highlight-form {
-      0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
-      70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
-    }
-
-    .highlight-form {
-      animation: highlight-form 1s ease-out;
-    }
-
-    /* Button Group */
-    .button-group {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 1rem;
-    }
-
-    .update-button {
-      background: var(--secondary);
-      color: white;
-    }
-
-    .update-button:hover {
-      background: var(--secondary-dark);
-    }
-
-    .allocate-button {
-      background: var(--primary);
-      color: white;
-    }
-
-    .allocate-button:hover {
-      background: var(--primary-dark);
-    }
-
-    /* Responsive adjustments */
     @media (max-width: 768px) {
-      .room-grid {
-        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-      }
-      
-      .form-grid {
+      .stats-grid {
         grid-template-columns: 1fr;
       }
-      
-      .header-container {
-        padding: 0 0.5rem;
+
+      .search-controls {
+        flex-direction: column;
       }
 
-      .header {
-        height: 60px;
+      .tenant-actions {
+        flex-direction: column;
       }
-
-      .allocation-container {
-        margin-top: 80px;
-      }
-      
-      .button-group {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Tenant section styling */
-    .tenant-container {
-      border: 1px solid var(--light-gray);
-      border-radius: var(--border-radius);
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      background-color: var(--white);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .tenant-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--light-gray);
-    }
-
-    .tenant-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--primary);
     }
   </style>
 </head>
 <body>
+  <!-- Header - Updated to match 1.html -->
   <header class="header">
     <div class="header-container">
       <a href="/" class="logo">
@@ -497,192 +498,83 @@
     </div>
   </header>
 
-  <div class="allocation-container">
-    <!-- Room Selection Grid -->
-    <h2 class="section-title">Select a Room</h2>
-    <div id="roomGridContainer"></div>
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Error Message -->
+    <div id="errorContainer" style="display: none;" class="error-message">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span id="errorMessage">An error occurred. Please try again.</span>
+    </div>
 
-    <!-- Form with ID for scrolling target -->
-    <form id="allocationForm">
-      <input type="hidden" id="selectedRoom" value="">
-      <input type="hidden" id="currentAction" value="allocate">
+    <!-- Revenue Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-title">All-Time Revenue</div>
+        <div class="stat-value" id="totalRevenue">
+          <div class="spinner"></div>
+        </div>
+        <div class="stat-desc">Cumulative revenue collected to date</div>
+      </div>
       
-      <!-- Tenant 1 Container -->
-      <div id="tenant1Container" class="tenant-container">
-        <div class="tenant-header">
-          <h3 class="tenant-title">Tenant 1</h3>
+      <div class="stat-card">
+        <div class="stat-title">Monthly Expected Revenue</div>
+        <div class="stat-value" id="monthlyRevenue">
+          <div class="spinner"></div>
         </div>
-        
-        <!-- Tenant 1 Basic Details Section -->
-        <div class="form-section">
-          <h3 class="section-title">Basic Details</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="moveInDate1">Move-In Date</label>
-              <input type="date" id="moveInDate1" required>
-            </div>
-            <div class="form-group">
-              <label for="rentStatus1">Rent Status</label>
-              <select id="rentStatus1" required>
-                <option value="Pending">Pending</option>
-                <option value="Unpaid">Unpaid</option>
-                <option value="Paid">Paid</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="lastPaidDate1">Last Paid Date</label>
-              <input type="date" id="lastPaidDate1" required>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tenant 1 Financial Details Section -->
-        <div class="form-section">
-          <h3 class="section-title">Financial Details</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="rentAmount1">Rent Amount</label>
-              <input type="number" id="rentAmount1" placeholder="Enter amount" required>
-            </div>
-            <div class="form-group">
-              <label for="foodCharges1">Food Charges</label>
-              <input type="number" id="foodCharges1" placeholder="Enter food charges">
-            </div>
-            <div class="form-group">
-              <label for="electricityCharges1">Electricity Charges</label>
-              <input type="number" id="electricityCharges1" placeholder="Enter electricity charges">
-            </div>
-          </div>
-        </div>
-
-        <!-- Tenant 1 Details Section -->
-        <div class="form-section">
-          <h3 class="section-title">Personal Details</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="tenantName1">Full Name</label>
-              <input type="text" id="tenantName1" placeholder="Full name" required>
-            </div>
-            <div class="form-group">
-              <label for="tenantGender1">Gender</label>
-              <select id="tenantGender1" required>
-                <option value="M">Male</option>
-                <option value="F">Female</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="tenantContact1">Contact</label>
-              <input type="text" id="tenantContact1" placeholder="Phone number" required>
-            </div>
-            <div class="form-group">
-              <label for="tenantGovtId1">Government ID</label>
-              <input type="text" id="tenantGovtId1" placeholder="Aadhaar/Voter ID/etc." required>
-            </div>
-          </div>
-          
-          <!-- Tenant 1 Action Buttons -->
-          <div class="button-group">
-            <button type="button" class="update-button" id="updateButton1">Update Tenant</button>
-            <button type="button" class="allocate-button" id="allocateButton1">Allocate Room</button>
-            <button type="button" class="vacant-button" id="vacantButton1">Vacant Room</button>
+        <div class="stat-desc">
+          Expected revenue for
+          <div class="date-selector">
+            <select id="monthSelector">
+              <option value="0">January</option>
+              <option value="1">February</option>
+              <option value="2">March</option>
+              <option value="3">April</option>
+              <option value="4">May</option>
+              <option value="5">June</option>
+              <option value="6">July</option>
+              <option value="7">August</option>
+              <option value="8">September</option>
+              <option value="9">October</option>
+              <option value="10">November</option>
+              <option value="11">December</option>
+            </select>
+            <select id="yearSelector"></select>
           </div>
         </div>
       </div>
-
-      <!-- Tenant 2 Container -->
-      <div id="tenant2Container" class="tenant-container">
-        <div class="tenant-header">
-          <h3 class="tenant-title">Tenant 2 (Optional)</h3>
+      
+      <div class="stat-card">
+        <div class="stat-title">Rent Paid Currently</div>
+        <div class="stat-value" id="currentPaidRent">
+          <div class="spinner"></div>
         </div>
-        
-        <!-- Tenant 2 Basic Details Section -->
-        <div class="form-section">
-          <h3 class="section-title">Basic Details</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="moveInDate2">Move-In Date</label>
-              <input type="date" id="moveInDate2">
-            </div>
-            <div class="form-group">
-              <label for="rentStatus2">Rent Status</label>
-              <select id="rentStatus2">
-                <option value="Pending">Pending</option>
-                <option value="Unpaid">Unpaid</option>
-                <option value="Paid">Paid</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="lastPaidDate2">Last Paid Date</label>
-              <input type="date" id="lastPaidDate2">
-            </div>
-          </div>
-        </div>
-
-        <!-- Tenant 2 Financial Details Section -->
-        <div class="form-section">
-          <h3 class="section-title">Financial Details</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="rentAmount2">Rent Amount</label>
-              <input type="number" id="rentAmount2" placeholder="Enter amount">
-            </div>
-            <div class="form-group">
-              <label for="foodCharges2">Food Charges</label>
-              <input type="number" id="foodCharges2" placeholder="Enter food charges">
-            </div>
-            <div class="form-group">
-              <label for="electricityCharges2">Electricity Charges</label>
-              <input type="number" id="electricityCharges2" placeholder="Enter electricity charges">
-            </div>
-          </div>
-        </div>
-
-        <!-- Tenant 2 Details Section -->
-        <div class="form-section">
-          <h3 class="section-title">Personal Details</h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="tenantName2">Full Name</label>
-              <input type="text" id="tenantName2" placeholder="Full name">
-            </div>
-            <div class="form-group">
-              <label for="tenantGender2">Gender</label>
-              <select id="tenantGender2">
-                <option value="M">Male</option>
-                <option value="F">Female</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="tenantContact2">Contact</label>
-              <input type="text" id="tenantContact2" placeholder="Phone number">
-            </div>
-            <div class="form-group">
-              <label for="tenantGovtId2">Government ID</label>
-              <input type="text" id="tenantGovtId2" placeholder="Aadhaar/Voter ID/etc.">
-            </div>
-          </div>
-          
-          <!-- Tenant 2 Action Buttons -->
-          <div class="button-group">
-            <button type="button" class="update-button" id="updateButton2">Update Tenant</button>
-            <button type="button" class="allocate-button" id="allocateButton2">Allocate Room</button>
-            <button type="button" class="vacant-button" id="vacantButton2">Vacant Room</button>
-          </div>
-        </div>
+        <div class="stat-desc">Rent collected for the selected month</div>
       </div>
-    </form>
+    </div>
+
+    <!-- Tenant Search -->
+    <div class="search-controls">
+      <input type="date" id="searchDate" />
+      <button id="searchButton">Search Due Payments</button>
+    </div>
+
+    <!-- Tenant List -->
+    <div id="tenantList" class="tenant-grid">
+      <div class="loading">
+        <div class="spinner"></div>
+        Loading tenant data...
+      </div>
+    </div>
   </div>
 
-  <!-- Popup for Success/Error Messages -->
-  <div class="overlay" id="overlay"></div>
-  <div class="popup" id="popup">
-    <p id="popupMessage"></p>
-    <button id="closePopup">OK</button>
-  </div>
-
-  <!-- Bottom Navigation -->
+  <!-- Bottom Navigation - Updated to match 1.html -->
   <nav class="bottom-nav">
-    <a class='nav-button active' href='allocate.html'>
+    <a class='nav-button' href='allocate.html'>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
         <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
       </svg>
@@ -694,7 +586,7 @@
       </svg>
       Home
     </a>
-    <a class='nav-button' href='rent.html'>
+    <a class='nav-button active' href='rent.html'>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
         <path d="M11.8,10.9c-2.27-0.59-3-1.2-3-2.15c0-1.09,1.01-1.85,2.7-1.85c1.78,0,2.44,0.85,2.5,2.1h2.21c-0.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94,0.42-3.5,1.68-3.5,3.61c0,2.31,1.91,3.46,4.7,4.13c2.5,0.6,3,1.48,3,2.41c0,0.69-0.49,1.79-2.7,1.79c-2.06,0-2.87-0.92-2.98-2.1h-2.2c0.12,2.19,1.76,3.42,3.68,3.83V21h3v-2.15c1.95-0.37,3.5-1.5,3.5-3.55C16.5,12.46,14.07,11.49,11.8,10.9z"/>
       </svg>
@@ -702,11 +594,10 @@
     </a>
   </nav>
 
-  <script type="module">
-    // Firebase Configuration
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
-    import { getDatabase, ref, set, get, remove, onValue, update } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
-
+<script>
+    // ----------------------------------------------------------------
+    // Firebase Configuration and Initialization
+    // ----------------------------------------------------------------
     const firebaseConfig = {
       apiKey: "AIzaSyBEX5lj5VRhmlxAhHskQJVB1G6uoVEVvmQ",
       authDomain: "diamoundbhai.firebaseapp.com",
@@ -717,573 +608,440 @@
       measurementId: "G-MK06SH1QNL",
       databaseURL: "https://diamoundbhai-default-rtdb.firebaseio.com"
     };
-
-    const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app);
-
-    // Helper function to show popup messages
-    function showPopup(message, type) {
-      const popup = document.getElementById("popup");
-      const overlay = document.getElementById("overlay");
-      const popupMessage = document.getElementById("popupMessage");
-
-      popupMessage.textContent = message;
-      popup.className = `popup ${type}`;
-      popup.style.display = "block";
-      overlay.style.display = "block";
-
-      // Auto-close the popup after 3 seconds
-      setTimeout(() => {
-        popup.style.display = "none";
-        overlay.style.display = "none";
-      }, 3000);
-    }
-
-    // Close popup when OK button is clicked
-    document.getElementById("closePopup").addEventListener("click", function() {
-      document.getElementById("popup").style.display = "none";
-      document.getElementById("overlay").style.display = "none";
-    });
-
-    // Generate the room grid with visual representation
-    function generateRoomGrid() {
-      const roomGridContainer = document.getElementById("roomGridContainer");
-      roomGridContainer.innerHTML = '';
-
-      // Create rooms organized by floor
-      for (let floor = 1; floor <= 6; floor++) {
-        // Create floor section
-        const floorSection = document.createElement("div");
-        floorSection.className = "floor-section";
-        floorSection.innerHTML = `<h3 class="floor-title">Floor ${floor}</h3>`;
-        
-        // Create room grid for this floor
-        const floorGrid = document.createElement("div");
-        floorGrid.className = "room-grid";
-        
-        // Add rooms to this floor
-        for (let r = 1; r <= 10; r++) {
-          const roomNumber = `${floor}${r < 10 ? '0' + r : r}`;
-          
-          // Create room box
-          const roomBox = document.createElement("div");
-          roomBox.className = "room-box vacant"; // Default to vacant
-          roomBox.dataset.roomNumber = roomNumber;
-          
-          // Set initial content (will be updated with real data)
-          roomBox.innerHTML = `
-            <div class="room-number">${roomNumber}</div>
-            <div class="occupancy-icon">👤0</div>
-            <div class="room-status">Vacant</div>
-          `;
-          
-          // Add click event to select room and scroll to form
-          roomBox.addEventListener("click", function() {
-            // Remove selected class from all rooms
-            document.querySelectorAll(".room-box").forEach(box => {
-              box.classList.remove("selected");
-            });
-            
-            // Add selected class to this room
-            this.classList.add("selected");
-            
-            // Set the selected room in the hidden input
-            document.getElementById("selectedRoom").value = this.dataset.roomNumber;
-            
-            // Load room details
-            loadRoomDetails(this.dataset.roomNumber);
-            
-            // Scroll to the form section with smooth behavior
-            const form = document.getElementById("allocationForm");
-            
-            // Add highlight effect to the form
-            form.classList.remove("highlight-form");
-            // Trigger reflow to restart animation
-            void form.offsetWidth;
-            form.classList.add("highlight-form");
-            
-            // Scroll to the form
-            form.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'start'
-            });
-            
-            // Focus on the first input field after scrolling
-            setTimeout(() => {
-              document.getElementById("moveInDate1").focus();
-            }, 800); // Delay to allow scroll to complete
-          });
-          
-          floorGrid.appendChild(roomBox);
-        }
-        
-        floorSection.appendChild(floorGrid);
-        roomGridContainer.appendChild(floorSection);
+  
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+  
+    // ----------------------------------------------------------------
+    // Initialize Month/Year Selectors and Search Date
+    // ----------------------------------------------------------------
+    const yearSelector = document.getElementById("yearSelector");
+    const monthSelector = document.getElementById("monthSelector");
+    const currentDateObj = new Date();
+    const currentYear = currentDateObj.getFullYear();
+  
+    // Populate the year selector (currentYear -2 to currentYear +2)
+    for (let year = currentYear - 2; year <= currentYear + 2; year++) {
+      const option = document.createElement("option");
+      option.value = year;
+      option.textContent = year;
+      if (year === currentYear) {
+        option.selected = true;
       }
-
-      // Update room status from Firebase
-      updateRoomStatus();
+      yearSelector.appendChild(option);
     }
-
-    // Update room status based on Firebase data
-    function updateRoomStatus() {
-      const roomsRef = ref(database, 'rooms');
-      
-      // Listen for changes in real-time
-      onValue(roomsRef, (snapshot) => {
-        const roomData = snapshot.exists() ? snapshot.val() : {};
-        
-        // Update all room boxes with current data
-        document.querySelectorAll(".room-box").forEach(roomBox => {
-          const roomNumber = roomBox.dataset.roomNumber;
-          const roomInfo = roomData[roomNumber];
-          
-          if (roomInfo) {
-            // Room is allocated
-            const tenants = roomInfo.tenants || [];
-            const occupancyCount = tenants.filter(t => t && t.trim() !== "").length;
-            
-            if (occupancyCount === 2) {
-              // Fully occupied
-              roomBox.className = "room-box occupied";
-              roomBox.querySelector(".occupancy-icon").innerHTML = "👥2";
-              roomBox.querySelector(".room-status").textContent = "Occupied";
-            } else if (occupancyCount === 1) {
-              // Partially occupied
-              roomBox.className = "room-box partial";
-              roomBox.querySelector(".occupancy-icon").innerHTML = "👤1";
-              roomBox.querySelector(".room-status").textContent = "Partial";
-            } else {
-              // Should be vacant, but has data
-              roomBox.className = "room-box vacant";
-              roomBox.querySelector(".occupancy-icon").innerHTML = "👤0";
-              roomBox.querySelector(".room-status").textContent = "Vacant";
-            }
-          } else {
-            // Room is vacant
-            roomBox.className = "room-box vacant";
-            roomBox.querySelector(".occupancy-icon").innerHTML = "👤0";
-            roomBox.querySelector(".room-status").textContent = "Vacant";
-          }
-        });
-      });
+  
+    // Set month selector to current month
+    monthSelector.value = currentDateObj.getMonth();
+  
+    // Set search date (for due payments list) to today
+    document.getElementById("searchDate").valueAsDate = currentDateObj;
+  
+    // ----------------------------------------------------------------
+    // Utility Functions
+    // ----------------------------------------------------------------
+    function showError(message) {
+      const errorContainer = document.getElementById("errorContainer");
+      const errorMessage = document.getElementById("errorMessage");
+      errorMessage.textContent = message;
+      errorContainer.style.display = "flex";
+      setTimeout(() => {
+        errorContainer.style.display = "none";
+      }, 5000);
     }
-
-    // Load existing room details
-    function loadRoomDetails(roomNumber) {
-      const roomRef = ref(database, 'rooms/' + roomNumber);
-      get(roomRef).then((snapshot) => {
-        if (snapshot.exists()) {
-          const roomData = snapshot.val();
-          
-          // Tenant 1 Basic details
-          document.getElementById("moveInDate1").value = roomData.moveInDate1 || roomData.moveInDate || '';
-          document.getElementById("rentStatus1").value = roomData.rentStatus1 || roomData.rentStatus || 'Pending';
-          document.getElementById("lastPaidDate1").value = roomData.lastPaidDate1 || roomData.lastPaidDate || roomData.moveInDate || '';
-          
-          // Tenant 1 Financial details
-          document.getElementById("rentAmount1").value = roomData.rentAmount1 || roomData.rentAmount || roomData.rent_due || '';
-          document.getElementById("foodCharges1").value = roomData.foodCharges1 || roomData.foodCharges || '';
-          document.getElementById("electricityCharges1").value = roomData.electricityCharges1 || roomData.electricityCharges || '';
-          
-          // Tenant 1 Personal details
-          document.getElementById("tenantName1").value = roomData.tenants ? roomData.tenants[0] || '' : '';
-          document.getElementById("tenantGender1").value = roomData.gender1 || roomData.gender || 'M';
-          document.getElementById("tenantContact1").value = roomData.contactNumbers ? roomData.contactNumbers[0] || '' : '';
-          document.getElementById("tenantGovtId1").value = roomData.govtIds ? roomData.govtIds[0] || '' : '';
-          
-          // Tenant 2 Basic details
-          document.getElementById("moveInDate2").value = roomData.moveInDate2 || roomData.moveInDate || '';
-          document.getElementById("rentStatus2").value = roomData.rentStatus2 || roomData.rentStatus || 'Pending';
-          document.getElementById("lastPaidDate2").value = roomData.lastPaidDate2 || roomData.lastPaidDate || roomData.moveInDate || '';
-          
-          // Tenant 2 Financial details
-          document.getElementById("rentAmount2").value = roomData.rentAmount2 || roomData.rentAmount || roomData.rent_due || '';
-          document.getElementById("foodCharges2").value = roomData.foodCharges2 || roomData.foodCharges || '';
-          document.getElementById("electricityCharges2").value = roomData.electricityCharges2 || roomData.electricityCharges || '';
-          
-          // Tenant 2 Personal details
-          document.getElementById("tenantName2").value = roomData.tenants && roomData.tenants.length > 1 ? roomData.tenants[1] || '' : '';
-          document.getElementById("tenantGender2").value = roomData.gender2 || 'M';
-          document.getElementById("tenantContact2").value = roomData.contactNumbers && roomData.contactNumbers.length > 1 ? roomData.contactNumbers[1] || '' : '';
-          document.getElementById("tenantGovtId2").value = roomData.govtIds && roomData.govtIds.length > 1 ? roomData.govtIds[1] || '' : '';
-        } else {
-          // Reset the form if no data exists
-          resetForm();
-        }
-      }).catch(err => {
-        console.error("Error loading room details:", err);
-        showPopup("Error loading room details: " + err.message, "error");
-      });
+  
+    function formatCurrency(amount) {
+      return '₹' + parseInt(amount).toLocaleString();
     }
-
-    // Reset form fields
-    function resetForm() {
-      // Tenant 1
-      document.getElementById("moveInDate1").value = '';
-      document.getElementById("rentStatus1").value = 'Pending';
-      document.getElementById("lastPaidDate1").value = '';
-      document.getElementById("rentAmount1").value = '';
-      document.getElementById("foodCharges1").value = '';
-      document.getElementById("electricityCharges1").value = '';
-      document.getElementById("tenantName1").value = '';
-      document.getElementById("tenantGender1").value = 'M';
-      document.getElementById("tenantContact1").value = '';
-      document.getElementById("tenantGovtId1").value = '';
-      
-      // Tenant 2
-      document.getElementById("moveInDate2").value = '';
-      document.getElementById("rentStatus2").value = 'Pending';
-      document.getElementById("lastPaidDate2").value = '';
-      document.getElementById("rentAmount2").value = '';
-      document.getElementById("foodCharges2").value = '';
-      document.getElementById("electricityCharges2").value = '';
-      document.getElementById("tenantName2").value = '';
-      document.getElementById("tenantGender2").value = 'M';
-      document.getElementById("tenantContact2").value = '';
-      document.getElementById("tenantGovtId2").value = '';
+  
+    function parseDate(dateStr) {
+      const [year, month, day] = dateStr.split("-");
+      return new Date(year, month - 1, day);
     }
-
-    // Get form data for saving to Firebase
-    function getFormData() {
-      const roomData = {
-        // Tenant 1 data
-        moveInDate1: document.getElementById("moveInDate1").value,
-        rentStatus1: document.getElementById("rentStatus1").value,
-        lastPaidDate1: document.getElementById("lastPaidDate1").value || document.getElementById("moveInDate1").value,
-        rentAmount1: parseFloat(document.getElementById("rentAmount1").value) || 0,
-        foodCharges1: parseFloat(document.getElementById("foodCharges1").value) || 0,
-        electricityCharges1: parseFloat(document.getElementById("electricityCharges1").value) || 0,
-        
-        // Tenant 2 data
-        moveInDate2: document.getElementById("moveInDate2").value,
-        rentStatus2: document.getElementById("rentStatus2").value,
-        lastPaidDate2: document.getElementById("lastPaidDate2").value || document.getElementById("moveInDate2").value,
-        rentAmount2: parseFloat(document.getElementById("rentAmount2").value) || 0,
-        foodCharges2: parseFloat(document.getElementById("foodCharges2").value) || 0,
-        electricityCharges2: parseFloat(document.getElementById("electricityCharges2").value) || 0,
-        
-        // For backward compatibility and room status
-        moveInDate: document.getElementById("moveInDate1").value,
-        rentStatus: document.getElementById("rentStatus1").value,
-        lastPaidDate: document.getElementById("lastPaidDate1").value || document.getElementById("moveInDate1").value,
-        
-        // Tenant details arrays
-        tenants: [
-          document.getElementById("tenantName1").value,
-          document.getElementById("tenantName2").value
-        ].filter(val => val && val.trim() !== ""),
-        
-        contactNumbers: [
-          document.getElementById("tenantContact1").value,
-          document.getElementById("tenantContact2").value
-        ].filter(val => val && val.trim() !== ""),
-        
-        govtIds: [
-          document.getElementById("tenantGovtId1").value,
-          document.getElementById("tenantGovtId2").value
-        ].filter(val => val && val.trim() !== "")
-      };
-      
-      // Calculate total charges for each tenant
-      roomData.totalCharges1 = roomData.rentAmount1 + roomData.foodCharges1 + roomData.electricityCharges1;
-      roomData.totalCharges2 = roomData.rentAmount2 + roomData.foodCharges2 + roomData.electricityCharges2;
-      
-      // Total charges for the room (for backward compatibility)
-      roomData.totalCharges = roomData.totalCharges1 + roomData.totalCharges2;
-      
-      // Add gender information
-      roomData.gender1 = document.getElementById("tenantGender1").value;
-      roomData.gender2 = document.getElementById("tenantGender2").value;
-      
-      // For backward compatibility
-      roomData.gender = document.getElementById("tenantGender1").value;
-      
-      // Determine occupancy status
-      const tenant2Name = document.getElementById("tenantName2").value.trim();
-      roomData.occupancyStatus = tenant2Name ? "Fully Occupied" : "Partially Occupied";
-      
-      return roomData;
+  
+    function formatDate(date) {
+      return date.toISOString().split("T")[0];
     }
-
-    // Update revenue data in Firebase
-    async function updateRevenueData(roomNumber, roomData, isNewAllocation = false, isVacating = false) {
+  
+    // ----------------------------------------------------------------
+    // Revenue Logic – Global Total Revenue & Monthly Collected
+    // ----------------------------------------------------------------
+    async function initializeTotalRevenue() {
       try {
-        // Get current revenue data
-        const revenueRef = ref(database, 'revenue');
-        const revenueSnapshot = await get(revenueRef);
-        const revenueData = revenueSnapshot.exists() ? revenueSnapshot.val() : {};
-        
-        // Get current monthly collected data
-        const monthlyRef = ref(database, 'monthlyCollected');
-        const monthlySnapshot = await get(monthlyRef);
-        const monthlyData = monthlySnapshot.exists() ? monthlySnapshot.val() : {};
-        
-        // Get current total revenue
-        const totalRevenueRef = ref(database, 'totalRevenue');
-        const totalRevenueSnapshot = await get(totalRevenueRef);
-        const totalRevenue = totalRevenueSnapshot.exists() ? totalRevenueSnapshot.val() : 0;
-        
-        // Current date for monthly tracking
-        const currentDate = new Date();
-        const currentMonth = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`;
-        
-        if (isVacating) {
-          // If vacating, we don't need to update revenue data
+        const totalRevenueRef = db.ref("totalRevenue");
+        const snapshot = await totalRevenueRef.once("value");
+        if (!snapshot.exists()) {
+          await totalRevenueRef.set(0);
+        }
+      } catch (error) {
+        console.error("Error initializing total revenue:", error);
+        showError("Failed to initialize total revenue. Please refresh the page.");
+      }
+    }
+  
+    async function initializeMonthlyCollected() {
+      try {
+        const now = new Date();
+        const mKey = `${now.getFullYear()}-${now.getMonth()}`;
+        const monthlyCollectedRef = db.ref(`monthlyCollected/${mKey}`);
+        const snapshot = await monthlyCollectedRef.once("value");
+        if (!snapshot.exists()) {
+          await monthlyCollectedRef.set(0);
+        }
+      } catch (error) {
+        console.error("Error initializing monthly collected:", error);
+        showError("Failed to initialize monthly collected. Please refresh the page.");
+      }
+    }
+  
+    function updateTotalRevenueDisplay() {
+      const totalRevenueRef = db.ref("totalRevenue");
+      totalRevenueRef.on("value", (snapshot) => {
+        document.getElementById("totalRevenue").textContent = formatCurrency(snapshot.val() || 0);
+      }, (error) => {
+        console.error("Error fetching total revenue:", error);
+        showError("Failed to load total revenue data. Please refresh the page.");
+      });
+    }
+  
+    async function updateMonthlyExpectedRevenue() {
+      try {
+        const selectedMonth = parseInt(monthSelector.value);
+        const selectedYear = parseInt(yearSelector.value);
+        const roomsSnapshot = await db.ref("rooms").once("value");
+        let totalExpected = 0;
+  
+        if (roomsSnapshot.exists()) {
+          const rooms = roomsSnapshot.val();
+          for (const roomNumber in rooms) {
+            const room = rooms[roomNumber];
+            let dueDate;
+            if (room.nextDueDate) {
+              dueDate = parseDate(room.nextDueDate);
+            } else {
+              // Fallback: use lastPaidDate or moveInDate then add 30 days
+              let baseDate = room.lastPaidDate || room.moveInDate || formatDate(new Date());
+              dueDate = new Date(parseDate(baseDate).getTime() + (30 * 24 * 60 * 60 * 1000));
+            }
+            // If dueDate falls in the selected month/year, add its charges to total expected revenue.
+            if (dueDate.getMonth() === selectedMonth && dueDate.getFullYear() === selectedYear) {
+              const rentDue = room.rent_due != null ? parseInt(room.rent_due) : 0;
+              const electricityBill = room.electricity_bill != null
+                ? parseInt(room.electricity_bill)
+                : (room.electricityCharges != null ? parseInt(room.electricityCharges) : 0);
+              const foodCharge = room.food_charge != null
+                ? parseInt(room.food_charge)
+                : (room.foodCharges != null ? parseInt(room.foodCharges) : 0);
+              totalExpected += rentDue + electricityBill + foodCharge;
+            }
+          }
+        }
+        document.getElementById("monthlyRevenue").textContent = formatCurrency(totalExpected);
+      } catch (error) {
+        console.error("Error updating monthly expected revenue:", error);
+        showError("Failed to update monthly expected revenue. Please try again.");
+      }
+    }
+  
+    async function updateMonthlyCollectedDisplay() {
+      try {
+        const selectedMonth = parseInt(monthSelector.value);
+        const selectedYear = parseInt(yearSelector.value);
+        const mKey = `${selectedYear}-${selectedMonth}`;
+        const monthlyCollectedRef = db.ref(`monthlyCollected/${mKey}`);
+        const snapshot = await monthlyCollectedRef.once("value");
+        const collected = snapshot.exists() ? snapshot.val() : 0;
+        document.getElementById("currentPaidRent").textContent = formatCurrency(collected);
+      } catch (error) {
+        console.error("Error updating monthly collected revenue:", error);
+        showError("Failed to update monthly collected revenue. Please try again.");
+      }
+    }
+  
+    async function updateRevenueDisplays() {
+      updateTotalRevenueDisplay();
+      await updateMonthlyExpectedRevenue();
+      await updateMonthlyCollectedDisplay();
+    }
+  
+    // ----------------------------------------------------------------
+    // Mark Rent as Paid – New Logic
+    // When a user marks a room's rent as paid, update revenue totals and room status.
+    // ----------------------------------------------------------------
+    async function markRentAsPaid(roomNumber, paymentDate) {
+      try {
+        const roomRef = db.ref(`rooms/${roomNumber}`);
+        const roomSnapshot = await roomRef.once("value");
+  
+        if (!roomSnapshot.exists()) {
+          showError(`Room ${roomNumber} not found.`);
           return;
         }
-        
-        // Calculate total charges for this room
-        const totalCharges = roomData.totalCharges || 0;
-        
-        // Update revenue data for this room
-        revenueData[roomNumber] = {
-          rentAmount: roomData.rentAmount1 + roomData.rentAmount2 || 0,
-          foodCharges: roomData.foodCharges1 + roomData.foodCharges2 || 0,
-          electricityCharges: roomData.electricityCharges1 + roomData.electricityCharges2 || 0,
-          totalCharges: totalCharges,
-          lastUpdated: new Date().toISOString()
-        };
-        
-        // Update monthly collected data
-        if (!monthlyData[currentMonth]) {
-          monthlyData[currentMonth] = 0;
-        }
-        
-        // If this is a new allocation or rent status changed to "Paid", add to monthly collected
-        if (isNewAllocation) {
-          if (roomData.rentStatus1 === "Paid") {
-            monthlyData[currentMonth] += roomData.totalCharges1;
-          }
-          if (roomData.rentStatus2 === "Paid" && roomData.tenants.length > 1) {
-            monthlyData[currentMonth] += roomData.totalCharges2;
-          }
-        }
-        
-        // Update total revenue if this is a new paid allocation
-        let newTotalRevenue = totalRevenue;
-        if (isNewAllocation) {
-          if (roomData.rentStatus1 === "Paid") {
-            newTotalRevenue += roomData.totalCharges1;
-          }
-          if (roomData.rentStatus2 === "Paid" && roomData.tenants.length > 1) {
-            newTotalRevenue += roomData.totalCharges2;
-          }
-        }
-        
-        // Save all updates to Firebase
-        await update(ref(database), {
-          'revenue': revenueData,
-          'monthlyCollected': monthlyData,
-          'totalRevenue': newTotalRevenue
+  
+        const roomData = roomSnapshot.val();
+        const rentDue = roomData.rent_due != null ? parseInt(roomData.rent_due) : 0;
+        const electricityBill = roomData.electricity_bill != null
+          ? parseInt(roomData.electricity_bill)
+          : (roomData.electricityCharges != null ? parseInt(roomData.electricityCharges) : 0);
+        const foodCharge = roomData.food_charge != null
+          ? parseInt(roomData.food_charge)
+          : (roomData.foodCharges != null ? parseInt(roomData.foodCharges) : 0);
+        const totalDue = rentDue + electricityBill + foodCharge;
+  
+        // Update global totalRevenue
+        const totalRevenueRef = db.ref("totalRevenue");
+        const globalSnapshot = await totalRevenueRef.once("value");
+        const currentTotal = globalSnapshot.exists() ? globalSnapshot.val() : 0;
+        const newTotal = currentTotal + totalDue;
+        await totalRevenueRef.set(newTotal);
+  
+        // Update monthly collected revenue for the month of the payment date.
+        const paymentDateObj = parseDate(paymentDate);
+        const monthKey = `${paymentDateObj.getFullYear()}-${paymentDateObj.getMonth()}`;
+        const monthlyCollectedRef = db.ref(`monthlyCollected/${monthKey}`);
+        const monthlySnapshot = await monthlyCollectedRef.once("value");
+        const currentMonthly = monthlySnapshot.exists() ? monthlySnapshot.val() : 0;
+        const newMonthly = currentMonthly + totalDue;
+        await monthlyCollectedRef.set(newMonthly);
+  
+        // Mark the room as paid: update rentStatus, lastPaidDate, and nextDueDate.
+        const nextDueDate = new Date(paymentDateObj.getTime());
+        nextDueDate.setDate(nextDueDate.getDate() + 30);
+        await roomRef.update({
+          rentStatus: "Paid",
+          lastPaidDate: paymentDate,
+          nextDueDate: formatDate(nextDueDate)
         });
-        
+  
+        updateRevenueDisplays();
+        getRentDueTenants(paymentDate);
       } catch (error) {
-        console.error("Error updating revenue data:", error);
-        showPopup("Error updating revenue data: " + error.message, "error");
+        console.error("Error marking rent as paid:", error);
+        showError(`Failed to mark rent as paid for Room ${roomNumber}. Please try again.`);
       }
     }
-
-    // Allocate Room Function
-    async function allocateRoom() {
-      const roomNumber = document.getElementById("selectedRoom").value;
-      if (!roomNumber) {
-        showPopup("Please select a room first.", "error");
-        return;
-      }
-
-      const roomData = getFormData();
-      const roomRef = ref(database, 'rooms/' + roomNumber);
-      
+  
+    // ----------------------------------------------------------------
+    // Tenant Functions
+    // ----------------------------------------------------------------
+    // Fetch and display tenants with rent due based on the search date.
+    async function getRentDueTenants(searchDateStr) {
       try {
-        // Check if this is a new allocation
-        const roomSnapshot = await get(roomRef);
-        const isNewAllocation = !roomSnapshot.exists();
-        
-        // Save room details in Firebase
-        await set(roomRef, roomData);
-        
-        // Update revenue data
-        await updateRevenueData(roomNumber, roomData, isNewAllocation);
-        
-        showPopup("Room allocated successfully!", "success");
-        resetForm();
-      } catch (error) {
-        showPopup("Error allocating room: " + error.message, "error");
-      }
-    }
-
-    // Update Tenant 1 Function
-    async function updateTenant1() {
-      const roomNumber = document.getElementById("selectedRoom").value;
-      if (!roomNumber) {
-        showPopup("Please select a room first.", "error");
-        return;
-      }
-
-      const roomRef = ref(database, 'rooms/' + roomNumber);
-      
-      try {
-        // Get current data first
-        const snapshot = await get(roomRef);
-        
-        if (snapshot.exists()) {
-          const currentData = snapshot.val();
-          
-          // Update tenant 1 details
-          const updates = {
-            // Basic details
-            moveInDate1: document.getElementById("moveInDate1").value,
-            rentStatus1: document.getElementById("rentStatus1").value,
-            lastPaidDate1: document.getElementById("lastPaidDate1").value || document.getElementById("moveInDate1").value,
-            
-            // Financial details
-            rentAmount1: parseFloat(document.getElementById("rentAmount1").value) || 0,
-            foodCharges1: parseFloat(document.getElementById("foodCharges1").value) || 0,
-            electricityCharges1: parseFloat(document.getElementById("electricityCharges1").value) || 0,
-            totalCharges1: parseFloat(document.getElementById("rentAmount1").value) + 
-                          parseFloat(document.getElementById("foodCharges1").value) + 
-                          parseFloat(document.getElementById("electricityCharges1").value) || 0,
-            
-            // For backward compatibility
-            moveInDate: document.getElementById("moveInDate1").value,
-            rentStatus: document.getElementById("rentStatus1").value,
-            lastPaidDate: document.getElementById("lastPaidDate1").value || document.getElementById("moveInDate1").value,
-            
-            // Tenant arrays
-            tenants: currentData.tenants || [],
-            contactNumbers: currentData.contactNumbers || [],
-            govtIds: currentData.govtIds || [],
-            
-            // Gender
-            gender1: document.getElementById("tenantGender1").value,
-            gender: document.getElementById("tenantGender1").value
-          };
-          
-          // Update tenant 1 details in arrays
-          updates.tenants[0] = document.getElementById("tenantName1").value;
-          updates.contactNumbers[0] = document.getElementById("tenantContact1").value;
-          updates.govtIds[0] = document.getElementById("tenantGovtId1").value;
-          
-          // Update in Firebase
-          await update(roomRef, updates);
-          showPopup("Tenant 1 details updated successfully!", "success");
-        } else {
-          showPopup("No data found for this room. Please allocate first.", "error");
+        const searchDate = parseDate(searchDateStr);
+        const roomsSnapshot = await db.ref("rooms").once("value");
+        const tenantList = document.getElementById("tenantList");
+        tenantList.innerHTML = "";
+  
+        if (!roomsSnapshot.exists()) {
+          tenantList.innerHTML = `
+            <div class="empty-state">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <h3>No rooms found</h3>
+              <p>No rooms have been added to the system yet.</p>
+            </div>
+          `;
+          return;
         }
-      } catch (error) {
-        showPopup("Error updating tenant details: " + error.message, "error");
-      }
-    }
-
-    // Update Tenant 2 Function
-    async function updateTenant2() {
-      const roomNumber = document.getElementById("selectedRoom").value;
-      if (!roomNumber) {
-        showPopup("Please select a room first.", "error");
-        return;
-      }
-
-      const roomRef = ref(database, 'rooms/' + roomNumber);
-      
-      try {
-        // Get current data first
-        const snapshot = await get(roomRef);
-        
-        if (snapshot.exists()) {
-          const currentData = snapshot.val();
-          
-          // Update tenant 2 details
-          const updates = {
-            // Basic details
-            moveInDate2: document.getElementById("moveInDate2").value,
-            rentStatus2: document.getElementById("rentStatus2").value,
-            lastPaidDate2: document.getElementById("lastPaidDate2").value || document.getElementById("moveInDate2").value,
-            
-            // Financial details
-            rentAmount2: parseFloat(document.getElementById("rentAmount2").value) || 0,
-            foodCharges2: parseFloat(document.getElementById("foodCharges2").value) || 0,
-            electricityCharges2: parseFloat(document.getElementById("electricityCharges2").value) || 0,
-            totalCharges2: parseFloat(document.getElementById("rentAmount2").value) + 
-                          parseFloat(document.getElementById("foodCharges2").value) + 
-                          parseFloat(document.getElementById("electricityCharges2").value) || 0,
-            
-            // Tenant arrays
-            tenants: currentData.tenants || [],
-            contactNumbers: currentData.contactNumbers || [],
-            govtIds: currentData.govtIds || [],
-            
-            // Gender
-            gender2: document.getElementById("tenantGender2").value
-          };
-          
-          // Update tenant 2 details in arrays
-          updates.tenants[1] = document.getElementById("tenantName2").value;
-          updates.contactNumbers[1] = document.getElementById("tenantContact2").value;
-          updates.govtIds[1] = document.getElementById("tenantGovtId2").value;
-          
-          // Update occupancy status
-          if (updates.tenants[1] && updates.tenants[1].trim() !== "") {
-            updates.occupancyStatus = "Fully Occupied";
+  
+        let count = 0;
+        const rooms = roomsSnapshot.val();
+  
+        for (const roomNumber in rooms) {
+          const roomData = rooms[roomNumber];
+          let dueDate;
+          if (roomData.nextDueDate) {
+            dueDate = parseDate(roomData.nextDueDate);
           } else {
-            updates.occupancyStatus = "Partially Occupied";
+            const baseDate = roomData.lastPaidDate || roomData.moveInDate || formatDate(new Date());
+            dueDate = new Date(parseDate(baseDate).getTime() + (30 * 24 * 60 * 60 * 1000));
           }
-          
-          // Update in Firebase
-          await update(roomRef, updates);
-          showPopup("Tenant 2 details updated successfully!", "success");
-        } else {
-          showPopup("No data found for this room. Please allocate first.", "error");
+  
+          if (searchDate >= dueDate) {
+            // If overdue and not paid, update status to Unpaid.
+            if (roomData.rentStatus !== "Paid") {
+              await db.ref(`rooms/${roomNumber}`).update({ rentStatus: "Unpaid" });
+              roomData.rentStatus = "Unpaid";
+            }
+  
+            count++;
+  
+            // Get charges using both potential field names.
+            const rentDueValue = roomData.rent_due != null ? parseInt(roomData.rent_due) : 0;
+            const electricityBillValue = roomData.electricity_bill != null
+              ? parseInt(roomData.electricity_bill)
+              : (roomData.electricityCharges != null ? parseInt(roomData.electricityCharges) : 0);
+            const foodChargeValue = roomData.food_charge != null
+              ? parseInt(roomData.food_charge)
+              : (roomData.foodCharges != null ? parseInt(roomData.foodCharges) : 0);
+  
+            const card = document.createElement("div");
+            card.className = "tenant-card";
+            card.innerHTML = `
+              <div class="tenant-header">
+                <span class="room-number">Room ${roomNumber}</span>
+                <span class="tenant-status ${roomData.rentStatus === 'Paid' ? 'status-paid' : 'status-unpaid'}">
+                  ${roomData.rentStatus}
+                </span>
+              </div>
+              <div class="tenant-body">
+                <div class="tenant-info">
+                  <p><strong>Tenant(s):</strong> ${roomData.tenants ? roomData.tenants.join(", ") : "No tenants"}</p>
+                  <p><strong>Last Paid:</strong> ${roomData.lastPaidDate || "Not paid yet"}</p>
+                  <p><strong>Next Due:</strong> ${roomData.nextDueDate || formatDate(dueDate)}</p>
+                  <p><strong>Rent Due:</strong> ${formatCurrency(rentDueValue)}</p>
+                  <p><strong>Electricity:</strong> ${formatCurrency(electricityBillValue)}</p>
+                  <p><strong>Food Charge:</strong> ${formatCurrency(foodChargeValue)}</p>
+                  <p><strong>Total Due:</strong> ${formatCurrency(rentDueValue + electricityBillValue + foodChargeValue)}</p>
+                </div>
+                <div class="tenant-actions">
+                  <button class="btn btn-outline" onclick="callTenant('${roomData.contactNumbers ? roomData.contactNumbers[0] : ''}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                    Call Tenant
+                  </button>
+                  <button class="btn btn-success" onclick="markRentAsPaid('${roomNumber}', '${searchDateStr}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Mark as Paid
+                  </button>
+                </div>
+              </div>
+            `;
+            tenantList.appendChild(card);
+          }
         }
-      } catch (error) {
-        showPopup("Error updating tenant details: " + error.message, "error");
+  
+        if (count === 0) {
+          tenantList.innerHTML = `
+            <div class="empty-state">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <h3>No rent dues found</h3>
+              <p>No tenants have rent due for the selected date.</p>
+            </div>
+          `;
+        }
+      }
+      catch (error) {
+        console.error("Error getting rent due tenants:", error);
+        showError("Failed to load tenant data. Please try again.");
+        document.getElementById("tenantList").innerHTML = `
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <h3>Error loading data</h3>
+            <p>There was a problem loading the tenant data. Please try again.</p>
+          </div>
+        `;
       }
     }
-
-    // Vacant Button Functionality
-    async function vacateRoom() {
-      const roomNumber = document.getElementById("selectedRoom").value;
-      if (!roomNumber) {
-        showPopup("Please select a room first.", "error");
+  
+    // Function to call tenant (opens the phone dialer)
+    function callTenant(phoneNumber) {
+      if (!phoneNumber) {
+        showError("No phone number available for this tenant.");
         return;
       }
-
-      const roomRef = ref(database, 'rooms/' + roomNumber);
-      
+      window.location.href = `tel:${phoneNumber}`;
+    }
+  
+    // ----------------------------------------------------------------
+    // CSV Export Functionality
+    // ----------------------------------------------------------------
+    function exportToCSV() {
       try {
-        // Get room data before removing
-        const snapshot = await get(roomRef);
-        if (snapshot.exists()) {
-          const roomData = snapshot.val();
-          
-          // Remove room from rooms collection
-          await remove(roomRef);
-          
-          // Update revenue data to reflect the vacancy
-          await updateRevenueData(roomNumber, roomData, false, true);
-          
-          showPopup("Room vacated successfully!", "success");
-          resetForm();
-        } else {
-          showPopup("Room is already vacant.", "info");
-        }
+        const selectedMonth = parseInt(monthSelector.value);
+        const selectedYear = parseInt(yearSelector.value);
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        db.ref("rooms").once("value", (snapshot) => {
+          if (!snapshot.exists()) {
+            showError("No data to export.");
+            return;
+          }
+          const rooms = snapshot.val();
+          let csvContent = "Room Number,Tenants,Rent Due,Electricity Bill,Food Charge,Total Charges,Last Paid Date,Next Due Date,Status\n";
+          for (const roomNumber in rooms) {
+            const room = rooms[roomNumber];
+            const rentDue = room.rent_due != null ? parseInt(room.rent_due) : 0;
+            const electricityBill = room.electricity_bill != null
+              ? parseInt(room.electricity_bill)
+              : (room.electricityCharges != null ? parseInt(room.electricityCharges) : 0);
+            const foodCharge = room.food_charge != null
+              ? parseInt(room.food_charge)
+              : (room.foodCharges != null ? parseInt(room.foodCharges) : 0);
+            const totalCharges = rentDue + electricityBill + foodCharge;
+            csvContent += `${roomNumber},`;
+            csvContent += `"${room.tenants ? room.tenants.join(", ") : ""}",`;
+            csvContent += `${rentDue},`;
+            csvContent += `${electricityBill},`;
+            csvContent += `${foodCharge},`;
+            csvContent += `${totalCharges},`;
+            csvContent += `${room.lastPaidDate || ""},`;
+            csvContent += `${room.nextDueDate || ""},`;
+            csvContent += `${room.rentStatus || ""}\n`;
+          }
+          const blob = new Blob([csvContent], { type: 'text/csv' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.setAttribute('hidden', '');
+          a.setAttribute('href', url);
+          a.setAttribute('download', `rent-data-${monthNames[selectedMonth]}-${selectedYear}.csv`);
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }, (error) => {
+          console.error("Error exporting data:", error);
+          showError("Failed to export data. Please try again.");
+        });
       } catch (error) {
-        showPopup("Error vacating room: " + error.message, "error");
+        console.error("Error exporting to CSV:", error);
+        showError("Failed to export data. Please try again.");
       }
     }
-
-    // Add event listeners for tenant 1 buttons
-    document.getElementById("updateButton1").addEventListener("click", updateTenant1);
-    document.getElementById("allocateButton1").addEventListener("click", allocateRoom);
-    document.getElementById("vacantButton1").addEventListener("click", vacateRoom);
-
-    // Add event listeners for tenant 2 buttons
-    document.getElementById("updateButton2").addEventListener("click", updateTenant2);
-    document.getElementById("allocateButton2").addEventListener("click", allocateRoom);
-    document.getElementById("vacantButton2").addEventListener("click", vacateRoom);
-
-    // Initialize room grid on page load
-    generateRoomGrid();
+  
+    // ----------------------------------------------------------------
+    // Event Listeners and App Initialization
+    // ----------------------------------------------------------------
+    document.getElementById("searchButton").addEventListener("click", function() {
+      const searchDate = document.getElementById("searchDate").value;
+      getRentDueTenants(searchDate);
+    });
+  
+    monthSelector.addEventListener("change", updateRevenueDisplays);
+    yearSelector.addEventListener("change", updateRevenueDisplays);
+    document.getElementById("exportBtn").addEventListener("click", exportToCSV);
+  
+    async function initApp() {
+      try {
+        await initializeTotalRevenue();
+        await initializeMonthlyCollected();
+        updateRevenueDisplays();
+        const today = formatDate(new Date());
+        getRentDueTenants(today);
+      } catch (error) {
+        console.error("Error initializing app:", error);
+        showError("Failed to initialize the application. Please refresh the page.");
+      }
+    }
+  
+    initApp();
+  
+    // Expose functions for onclick handlers
+    window.markRentAsPaid = markRentAsPaid;
+    window.callTenant = callTenant;
   </script>
 </body>
 </html>
