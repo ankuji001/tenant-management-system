@@ -1,472 +1,1047 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Diamond PG - Rent Management</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-     :root {
-        --primary: #2563eb;
-        --primary-dark: #1d4ed8;
-        --primary-light: #dbeafe;
-        --secondary: #10b981;
-        --secondary-dark: #059669;
-        --danger: #ef4444;
-        --warning: #f59e0b;
-        --dark: #1e293b;
-        --gray: #64748b;
-        --light-gray: #e2e8f0;
-        --white: #ffffff;
-        --body-bg: #f8fafc;
-        --card-bg: #ffffff;
-        --border-radius: 0.5rem;
-        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-          0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-          0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        --font-family: 'Poppins', sans-serif;
-        --font-family-heading: 'Montserrat', sans-serif;
-        --transition: all 0.3s ease;
-      }
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rent Management Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap" rel="stylesheet" />
+  <!-- Removed Chart.js script as it is no longer used -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #dbeafe;
+      --secondary: #10b981;
+      --secondary-light: #d1fae5;
+      --danger: #ef4444;
+      --danger-light: #fee2e2;
+      --warning: #f59e0b;
+      --warning-light: #fef3c7;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --radius: 0.5rem;
+      --font-family: 'Poppins', sans-serif;
+      --font-family-heading: 'Montserrat', sans-serif;
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--gray-50);
+      color: var(--gray-800);
+      line-height: 1.5;
+      min-height: 100vh;
+      padding-bottom: 70px;
+    }
+
+    .container {
+      max-width: 1700px;
+      margin: 0 auto;
+      padding: 1.5rem;
+      
+    }
+
+    /* Header - Updated to match 1.html */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: white;
+      box-shadow: var(--shadow);
+      z-index: 100;
+      height: 70px;
+    }
+
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 100%;
+      padding: 0 1rem;
+      max-width: 1700px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      font-family: var(--font-family-heading);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius);
+      font-weight: 500;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      outline: none;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .btn-icon {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--gray-300);
+      color: var(--gray-700);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--gray-100);
+    }
+
+    .btn-success {
+      background-color: var(--secondary);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background-color: var(--secondary);
+      opacity: 0.9;
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: var(--danger);
+      opacity: 0.9;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    ;
+    }
+
+    .card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .card-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .grid-cols-1 {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+     
+    }
+
+    .stat-card {
+      background-color: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      margin-top: 100px;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-500);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-desc {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      margin-top: auto;
+    }
+
+    .date-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .date-selector select {
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-300);
+      font-size: 0.875rem;
+    }
+
+    .search-controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-controls input,
+    .search-controls button {
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-300);
+      font-size: 0.875rem;
+    }
+
+    .search-controls input {
+      flex: 1;
+    }
+
+    .search-controls button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .search-controls button:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .tenant-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .tenant-card {
+      background-color: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .tenant-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .tenant-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .room-number {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .tenant-status {
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+    }
+
+    .status-paid {
+      background-color: var(--secondary-light);
+      color: var(--secondary);
+    }
+
+    .status-unpaid {
+      background-color: var(--danger-light);
+      color: var(--danger);
+    }
+
+    .tenant-body {
+      padding: 1.5rem;
+    }
+
+    .tenant-info {
+      margin-bottom: 1rem;
+    }
+
+    .tenant-info p {
+      margin-bottom: 0.5rem;
+      color: var(--gray-600);
+    }
+
+    .tenant-info p strong {
+      color: var(--gray-800);
+    }
+
+    .tenant-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .tenant-actions button {
+      flex: 1;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      color: var(--gray-500);
+    }
+
+    .spinner {
+      border: 3px solid var(--gray-200);
+      border-top: 3px solid var(--primary);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin-right: 0.75rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      color: var(--gray-500);
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 1rem;
+      color: var(--gray-400);
+    }
+
+    .empty-state h3 {
+      font-size: 1.125rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+    }
+
+    .error-message {
+      background-color: var(--danger-light);
+      color: var(--danger);
+      padding: 1rem;
+      border-radius: var(--radius);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .error-message svg {
+      margin-right: 0.75rem;
+      flex-shrink: 0;
+    }
+
+    /* Bottom Navigation - Updated to match 1.html */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: white;
+      box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+      display: flex;
+      z-index: 100;
+    }
+
+    .nav-button {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-decoration: none;
+      padding: 8px 0;
+      border-radius: 0;
+      transition: var(--transition);
+      color: var(--gray-500);
+      font-size: 0.75rem;
+    }
+
+    .nav-button svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .bottom-nav .nav-button:hover {
+      background: rgba(37, 99, 235, 0.1);
+      color: var(--primary);
+    }
+
+    .nav-button.active {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
       }
 
-      body {
-        font-family: var(--font-family);
-        background-color: var(--body-bg);
-        color: var(--dark);
-        min-height: 100vh;
-        line-height: 1.6;
-        padding-bottom: 70px;
-      }
-
-      .header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background-color: var(--white);
-        box-shadow: var(--shadow);
-        z-index: 100;
-        height: 70px;
-      }
-
-      .header-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 100%;
-        padding: 0 1rem;
-        max-width: 1700px;
-        margin: 0 auto;
-      }
-
-      .logo {
-        font-family: var(--font-family-heading);
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: var(--primary);
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: var(--border-radius);
-        font-weight: 500;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: var(--transition);
-        border: none;
-        outline: none;
-        text-decoration: none;
-      }
-
-      .btn-primary {
-        background-color: var(--primary);
-        color: var(--white);
-      }
-
-      .btn-primary:hover {
-        background-color: var(--primary-dark);
-      }
-
-      .btn-icon {
-        width: 18px;
-        height: 18px;
-        fill: currentColor;
-      }
-
-      .management-container {
-        max-width: 1200px;
-        margin: 100px auto 2rem;
-        padding: 0 1rem;
-      }
-
-      .controls-wrapper {
-        display: grid;
-        grid-template-columns: 1fr 200px;
-        gap: 1rem;
-        margin-bottom: 2rem;
-      }
-
-      input,
-      button {
-        width: 100%;
-        padding: 14px 20px;
-        border: 1px solid var(--light-gray);
-        border-radius: var(--border-radius);
-        background: var(--card-bg);
-        color: var(--dark);
-        font-size: 1rem;
-        transition: var(--transition);
-      }
-
-      input:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
-      }
-
-      button {
-        background: var(--primary);
-        color: var(--white);
-        cursor: pointer;
-        transition: var(--transition);
-      }
-
-      button:hover {
-        background: var(--primary-dark);
-        transform: translateY(-2px);
-      }
-
-      #tenantList {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 1rem;
-        padding-bottom: 2rem;
-      }
-
-      .tenant-card {
-        background: var(--card-bg);
-        border-radius: var(--border-radius);
-        border: 1px solid var(--light-gray);
-        box-shadow: var(--shadow);
-        padding: 1.5rem;
-        transition: var(--transition);
-      }
-
-      .tenant-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-lg);
-      }
-
-      .tenant-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-      }
-
-      .room-number {
-        font-weight: 600;
-        color: var(--primary);
-        letter-spacing: 0.05em;
-      }
-
-      .tenant-details p {
-        color: var(--gray);
-        margin-bottom: 0.75rem;
+      .search-controls {
+        flex-direction: column;
       }
 
       .tenant-actions {
-        display: flex;
-        gap: 0.75rem;
-        margin-top: 1.5rem;
-      }
-
-      .action-btn {
-        flex: 1;
-        padding: 10px 16px;
-        border-radius: var(--border-radius);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        background-color: var(--primary);
-        color: var(--white);
-        border: none;
-        cursor: pointer;
-        transition: var(--transition);
-      }
-
-      .call-btn:hover {
-        background: var(--primary-dark);
-      }
-
-      .pay-btn {
-        background: var(--secondary);
-      }
-      
-      .pay-btn:hover {
-        background: var(--secondary-dark);
-      }
-
-      .status-message {
-        text-align: center;
-        padding: 1rem;
-        color: var(--gray);
-      }
-
-      /* Bottom Navigation */
-      .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: var(--white);
-        box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
-        display: flex;
-        z-index: 100;
-      }
-
-      .nav-button {
-        flex: 1;
-        display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        text-decoration: none;
-        padding: 8px 0;
-        border-radius: 0;
-        transition: var(--transition);
-        color: var(--gray);
-        font-size: 0.75rem;
       }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header - Updated to match 1.html -->
+  <header class="header">
+    <div class="header-container">
+      <a href="/" class="logo">
+        mytenants.online
+      </a>
+      <div class="header-actions">
+        <button id="exportBtn" class="btn btn-primary">
+          <svg class="btn-icon" viewBox="0 0 24 24">
+            <path d="M14,2H6C4.89,2 4,2.89 4,4V20C4,21.11 4.89,22 6,22H18C19.11,22 20,21.11 20,20V8L14,2M18,20H6V4H13V9H18V20M10,19L12,15H9V10H15V15H12L14,19H10Z" />
+          </svg>
+          Export to CSV
+        </button>
+      </div>
+    </div>
+  </header>
 
-      .nav-button svg {
-        width: 20px;
-        height: 20px;
-        fill: currentColor;
-      }
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Error Message -->
+    <div id="errorContainer" style="display: none;" class="error-message">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span id="errorMessage">An error occurred. Please try again.</span>
+    </div>
 
-      .bottom-nav .nav-button:hover {
-        background: rgba(37, 99, 235, 0.1);
-        color: var(--primary);
-      }
-
-      .nav-button.active {
-        color: var(--primary);
-        font-weight: 600;
-      }
-
-      @media (max-width: 768px) {
-        .controls-wrapper {
-          grid-template-columns: 1fr;
-        }
-
-        .tenant-actions {
-          flex-direction: column;
-        }
-        
-        .header-container {
-          padding: 0 0.5rem;
-        }
-
-        .header {
-          height: 60px;
-        }
-
-        .management-container {
-          margin-top: 80px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <header class="header">
-      <div class="header-container">
-        <a href="/" class="logo">
-          mytenants.in
-        </a>
-        <div class="header-actions">
-          <button id="exportBtn" class="btn btn-primary">
-            <svg class="btn-icon" viewBox="0 0 24 24">
-              <path d="M14,2H6C4.89,2 4,2.89 4,4V20C4,21.11 4.89,22 6,22H18C19.11,22 20,21.11 20,20V8L14,2M18,20H6V4H13V9H18V20M10,19L12,15H9V10H15V15H12L14,19H10Z" />
-            </svg>
-            Export to CSV
-          </button>
+    <!-- Revenue Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-title">All-Time Revenue</div>
+        <div class="stat-value" id="totalRevenue">
+          <div class="spinner"></div>
+        </div>
+        <div class="stat-desc">Cumulative revenue collected to date</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-title">Monthly Expected Revenue</div>
+        <div class="stat-value" id="monthlyRevenue">
+          <div class="spinner"></div>
+        </div>
+        <div class="stat-desc">
+          Expected revenue for
+          <div class="date-selector">
+            <select id="monthSelector">
+              <option value="0">January</option>
+              <option value="1">February</option>
+              <option value="2">March</option>
+              <option value="3">April</option>
+              <option value="4">May</option>
+              <option value="5">June</option>
+              <option value="6">July</option>
+              <option value="7">August</option>
+              <option value="8">September</option>
+              <option value="9">October</option>
+              <option value="10">November</option>
+              <option value="11">December</option>
+            </select>
+            <select id="yearSelector"></select>
+          </div>
         </div>
       </div>
-    </header>
       
-    <div class="management-container">
-      <div class="controls-wrapper">
-        <input type="date" id="searchDate" />
-        <button id="searchButton">Search Due</button>
+      <div class="stat-card">
+        <div class="stat-title">Rent Paid Currently</div>
+        <div class="stat-value" id="currentPaidRent">
+          <div class="spinner"></div>
+        </div>
+        <div class="stat-desc">Rent collected for the selected month</div>
       </div>
-      <div id="tenantList"></div>
     </div>
-    
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-      <a class='nav-button' href='allocate.html'>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
-        </svg>
-        Allocate
-      </a>
-      <a class='nav-button' href='index.html'>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z"/>
-        </svg>
-        Home
-      </a>
-      <a class='nav-button active' href='rent.html'>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M11.8,10.9c-2.27-0.59-3-1.2-3-2.15c0-1.09,1.01-1.85,2.7-1.85c1.78,0,2.44,0.85,2.5,2.1h2.21c-0.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94,0.42-3.5,1.68-3.5,3.61c0,2.31,1.91,3.46,4.7,4.13c2.5,0.6,3,1.48,3,2.41c0,0.69-0.49,1.79-2.7,1.79c-2.06,0-2.87-0.92-2.98-2.1h-2.2c0.12,2.19,1.76,3.42,3.68,3.83V21h3v-2.15c1.95-0.37,3.5-1.5,3.5-3.55C16.5,12.46,14.07,11.49,11.8,10.9z"/>
-        </svg>
-        Rent
-      </a>
-    </nav>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
-        import {
-            getDatabase,
-            ref,
-            get,
-            update,
-        } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
-    
-        const firebaseConfig = {
-            apiKey: "AIzaSyBEX5lj5VRhmlxAhHskQJVB1G6uoVEVvmQ",
-            authDomain: "diamoundbhai.firebaseapp.com",
-            projectId: "diamoundbhai",
-            storageBucket: "diamoundbhai.firebasestorage.app",
-            messagingSenderId: "236932120968",
-            appId: "1:236932120968:web:a3d9ec830d48757024fa3d",
-            measurementId: "G-MK06SH1QNL",
-        };
-    
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-    
-        function parseDate(dateStr) {
-            const [year, month, day] = dateStr.split("-");
-            return new Date(year, month - 1, day);
+    <!-- Tenant Search -->
+    <div class="search-controls">
+      <input type="date" id="searchDate" />
+      <button id="searchButton">Search Due Payments</button>
+    </div>
+
+    <!-- Tenant List -->
+    <div id="tenantList" class="tenant-grid">
+      <div class="loading">
+        <div class="spinner"></div>
+        Loading tenant data...
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation - Updated to match 1.html -->
+  <nav class="bottom-nav">
+    <a class='nav-button' href='allocate.html'>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+      </svg>
+      Allocate
+    </a>
+    <a class='nav-button' href='index.html'>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z"/>
+      </svg>
+      Home
+    </a>
+    <a class='nav-button active' href='rent.html'>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M11.8,10.9c-2.27-0.59-3-1.2-3-2.15c0-1.09,1.01-1.85,2.7-1.85c1.78,0,2.44,0.85,2.5,2.1h2.21c-0.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94,0.42-3.5,1.68-3.5,3.61c0,2.31,1.91,3.46,4.7,4.13c2.5,0.6,3,1.48,3,2.41c0,0.69-0.49,1.79-2.7,1.79c-2.06,0-2.87-0.92-2.98-2.1h-2.2c0.12,2.19,1.76,3.42,3.68,3.83V21h3v-2.15c1.95-0.37,3.5-1.5,3.5-3.55C16.5,12.46,14.07,11.49,11.8,10.9z"/>
+      </svg>
+      Rent
+    </a>
+  </nav>
+
+<script>
+    // ----------------------------------------------------------------
+    // Firebase Configuration and Initialization
+    // ----------------------------------------------------------------
+    const firebaseConfig = {
+      apiKey: "AIzaSyBEX5lj5VRhmlxAhHskQJVB1G6uoVEVvmQ",
+      authDomain: "diamoundbhai.firebaseapp.com",
+      projectId: "diamoundbhai",
+      storageBucket: "diamoundbhai.firebasestorage.app",
+      messagingSenderId: "236932120968",
+      appId: "1:236932120968:web:a3d9ec830d48757024fa3d",
+      measurementId: "G-MK06SH1QNL",
+      databaseURL: "https://diamoundbhai-default-rtdb.firebaseio.com"
+    };
+  
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+  
+    // ----------------------------------------------------------------
+    // Initialize Month/Year Selectors and Search Date
+    // ----------------------------------------------------------------
+    const yearSelector = document.getElementById("yearSelector");
+    const monthSelector = document.getElementById("monthSelector");
+    const currentDateObj = new Date();
+    const currentYear = currentDateObj.getFullYear();
+  
+    // Populate the year selector (currentYear -2 to currentYear +2)
+    for (let year = currentYear - 2; year <= currentYear + 2; year++) {
+      const option = document.createElement("option");
+      option.value = year;
+      option.textContent = year;
+      if (year === currentYear) {
+        option.selected = true;
+      }
+      yearSelector.appendChild(option);
+    }
+  
+    // Set month selector to current month
+    monthSelector.value = currentDateObj.getMonth();
+  
+    // Set search date (for due payments list) to today
+    document.getElementById("searchDate").valueAsDate = currentDateObj;
+  
+    // ----------------------------------------------------------------
+    // Utility Functions
+    // ----------------------------------------------------------------
+    function showError(message) {
+      const errorContainer = document.getElementById("errorContainer");
+      const errorMessage = document.getElementById("errorMessage");
+      errorMessage.textContent = message;
+      errorContainer.style.display = "flex";
+      setTimeout(() => {
+        errorContainer.style.display = "none";
+      }, 5000);
+    }
+  
+    function formatCurrency(amount) {
+      return '₹' + parseInt(amount).toLocaleString();
+    }
+  
+    function parseDate(dateStr) {
+      const [year, month, day] = dateStr.split("-");
+      return new Date(year, month - 1, day);
+    }
+  
+    function formatDate(date) {
+      return date.toISOString().split("T")[0];
+    }
+  
+    // ----------------------------------------------------------------
+    // Revenue Logic – Global Total Revenue & Monthly Collected
+    // ----------------------------------------------------------------
+    async function initializeTotalRevenue() {
+      try {
+        const totalRevenueRef = db.ref("totalRevenue");
+        const snapshot = await totalRevenueRef.once("value");
+        if (!snapshot.exists()) {
+          await totalRevenueRef.set(0);
         }
-    
-        function formatDate(date) {
-            return date.toISOString().split("T")[0];
+      } catch (error) {
+        console.error("Error initializing total revenue:", error);
+        showError("Failed to initialize total revenue. Please refresh the page.");
+      }
+    }
+  
+    async function initializeMonthlyCollected() {
+      try {
+        const now = new Date();
+        const mKey = `${now.getFullYear()}-${now.getMonth()}`;
+        const monthlyCollectedRef = db.ref(`monthlyCollected/${mKey}`);
+        const snapshot = await monthlyCollectedRef.once("value");
+        if (!snapshot.exists()) {
+          await monthlyCollectedRef.set(0);
         }
-    
-        window.markPaid = async function (roomNumber, paymentDate) {
-            const paymentDateObj = new Date(paymentDate);
-            const nextDueDate = new Date(paymentDateObj);
-            nextDueDate.setDate(nextDueDate.getDate() + 30);
-    
-            const updates = {
-                rentStatus: "Paid",
-                lastPaidDate: paymentDate,
-                nextDueDate: formatDate(nextDueDate)
-            };
-    
-            await update(ref(db, `rooms/${roomNumber}`), updates);
-            getRentDueTenants(document.getElementById("searchDate").value);
-        };
-    
-        async function getRentDueTenants(searchDateStr) {
-            const searchDate = parseDate(searchDateStr);
-            const roomsSnapshot = await get(ref(db, "rooms/"));
-            const tenantList = document.getElementById("tenantList");
-            tenantList.innerHTML = "";
-    
-            if (!roomsSnapshot.exists()) return;
-    
-            let count = 0;
-            const rooms = roomsSnapshot.val();
-    
-            for (const roomNumber in rooms) {
-                const roomData = rooms[roomNumber];
-                const dueDate = roomData.nextDueDate 
-                    ? parseDate(roomData.nextDueDate)
-                    : new Date(parseDate(roomData.lastPaidDate || roomData.moveInDate).getTime() + 30 * 24 * 60 * 60 * 1000);
-    
-                if (searchDate >= dueDate) {
-                    let currentStatus = roomData.rentStatus;
-                    if (currentStatus !== "Paid") {
-                        await update(ref(db, `rooms/${roomNumber}`), {
-                            rentStatus: "Unpaid",
-                        });
-                        currentStatus = "Unpaid";
-                    }
-    
-                    count++;
-                    const card = document.createElement("div");
-                    card.className = "tenant-card";
-                    card.innerHTML = `
-                        <div class="tenant-header">
-                            <span class="room-number">Room ${roomNumber}</span>
-                        </div>
-                        <div class="tenant-details">
-                            <p>${roomData.tenants.join(", ")}</p>
-                            <p>Last Paid: ${roomData.lastPaidDate}</p>
-                            <p>Next Due: ${roomData.nextDueDate || formatDate(dueDate)}</p>
-                            <p>Rent Due: ₹${roomData.rent_due}</p>
-                        </div>
-                        <div class="tenant-actions">
-                            <button class="action-btn call-btn" onclick="callTenant('${roomData.contactNumbers[0]}')">
-                                <svg class="call-icon" viewBox="0 0 24 24" width="16" height="16"><path d="M6.62,10.79C8.06,13.62 10.38,15.94 13.21,17.38L15.41,15.18C15.69,14.9 16.08,14.82 16.43,14.93C17.55,15.3 18.75,15.5 20,15.5A1,1 0 0,1 21,16.5V20A1,1 0 0,1 20,21A17,17 0 0,1 3,4A1,1 0 0,1 4,3H7.5A1,1 0 0,1 8.5,4C8.5,5.25 8.7,6.45 9.07,7.57C9.18,7.92 9.1,8.31 8.82,8.59L6.62,10.79Z" fill="currentColor"/></svg>
-                                Call Tenant
-                            </button>
-                            <button class="action-btn pay-btn" onclick="markPaid('${roomNumber}', '${searchDateStr}')">
-                                Mark Paid
-                            </button>
-                        </div>
-                    `;
-                    tenantList.appendChild(card);
-                }
+      } catch (error) {
+        console.error("Error initializing monthly collected:", error);
+        showError("Failed to initialize monthly collected. Please refresh the page.");
+      }
+    }
+  
+    function updateTotalRevenueDisplay() {
+      const totalRevenueRef = db.ref("totalRevenue");
+      totalRevenueRef.on("value", (snapshot) => {
+        document.getElementById("totalRevenue").textContent = formatCurrency(snapshot.val() || 0);
+      }, (error) => {
+        console.error("Error fetching total revenue:", error);
+        showError("Failed to load total revenue data. Please refresh the page.");
+      });
+    }
+  
+    async function updateMonthlyExpectedRevenue() {
+      try {
+        const selectedMonth = parseInt(monthSelector.value);
+        const selectedYear = parseInt(yearSelector.value);
+        const roomsSnapshot = await db.ref("rooms").once("value");
+        let totalExpected = 0;
+  
+        if (roomsSnapshot.exists()) {
+          const rooms = roomsSnapshot.val();
+          for (const roomNumber in rooms) {
+            const room = rooms[roomNumber];
+            let dueDate;
+            if (room.nextDueDate) {
+              dueDate = parseDate(room.nextDueDate);
+            } else {
+              // Fallback: use lastPaidDate or moveInDate then add 30 days
+              let baseDate = room.lastPaidDate || room.moveInDate || formatDate(new Date());
+              dueDate = new Date(parseDate(baseDate).getTime() + (30 * 24 * 60 * 60 * 1000));
             }
-    
-            if (count === 0) {
-                tenantList.innerHTML = `<div class="status-message">No rent dues found for selected date</div>`;
+            // If dueDate falls in the selected month/year, add its charges to total expected revenue.
+            if (dueDate.getMonth() === selectedMonth && dueDate.getFullYear() === selectedYear) {
+              const rentDue = room.rent_due != null ? parseInt(room.rent_due) : 0;
+              const electricityBill = room.electricity_bill != null
+                ? parseInt(room.electricity_bill)
+                : (room.electricityCharges != null ? parseInt(room.electricityCharges) : 0);
+              const foodCharge = room.food_charge != null
+                ? parseInt(room.food_charge)
+                : (room.foodCharges != null ? parseInt(room.foodCharges) : 0);
+              totalExpected += rentDue + electricityBill + foodCharge;
             }
+          }
         }
-    
-        window.callTenant = function (phoneNumber) {
-            window.location.href = `tel:${phoneNumber}`;
-        };
-    
-        document.getElementById("searchButton").addEventListener("click", () => {
-            const searchDate = document.getElementById("searchDate").value;
-            getRentDueTenants(searchDate || formatDate(new Date()));
+        document.getElementById("monthlyRevenue").textContent = formatCurrency(totalExpected);
+      } catch (error) {
+        console.error("Error updating monthly expected revenue:", error);
+        showError("Failed to update monthly expected revenue. Please try again.");
+      }
+    }
+  
+    async function updateMonthlyCollectedDisplay() {
+      try {
+        const selectedMonth = parseInt(monthSelector.value);
+        const selectedYear = parseInt(yearSelector.value);
+        const mKey = `${selectedYear}-${selectedMonth}`;
+        const monthlyCollectedRef = db.ref(`monthlyCollected/${mKey}`);
+        const snapshot = await monthlyCollectedRef.once("value");
+        const collected = snapshot.exists() ? snapshot.val() : 0;
+        document.getElementById("currentPaidRent").textContent = formatCurrency(collected);
+      } catch (error) {
+        console.error("Error updating monthly collected revenue:", error);
+        showError("Failed to update monthly collected revenue. Please try again.");
+      }
+    }
+  
+    async function updateRevenueDisplays() {
+      updateTotalRevenueDisplay();
+      await updateMonthlyExpectedRevenue();
+      await updateMonthlyCollectedDisplay();
+    }
+  
+    // ----------------------------------------------------------------
+    // Mark Rent as Paid – New Logic
+    // When a user marks a room's rent as paid, update revenue totals and room status.
+    // ----------------------------------------------------------------
+    async function markRentAsPaid(roomNumber, paymentDate) {
+      try {
+        const roomRef = db.ref(`rooms/${roomNumber}`);
+        const roomSnapshot = await roomRef.once("value");
+  
+        if (!roomSnapshot.exists()) {
+          showError(`Room ${roomNumber} not found.`);
+          return;
+        }
+  
+        const roomData = roomSnapshot.val();
+        const rentDue = roomData.rent_due != null ? parseInt(roomData.rent_due) : 0;
+        const electricityBill = roomData.electricity_bill != null
+          ? parseInt(roomData.electricity_bill)
+          : (roomData.electricityCharges != null ? parseInt(roomData.electricityCharges) : 0);
+        const foodCharge = roomData.food_charge != null
+          ? parseInt(roomData.food_charge)
+          : (roomData.foodCharges != null ? parseInt(roomData.foodCharges) : 0);
+        const totalDue = rentDue + electricityBill + foodCharge;
+  
+        // Update global totalRevenue
+        const totalRevenueRef = db.ref("totalRevenue");
+        const globalSnapshot = await totalRevenueRef.once("value");
+        const currentTotal = globalSnapshot.exists() ? globalSnapshot.val() : 0;
+        const newTotal = currentTotal + totalDue;
+        await totalRevenueRef.set(newTotal);
+  
+        // Update monthly collected revenue for the month of the payment date.
+        const paymentDateObj = parseDate(paymentDate);
+        const monthKey = `${paymentDateObj.getFullYear()}-${paymentDateObj.getMonth()}`;
+        const monthlyCollectedRef = db.ref(`monthlyCollected/${monthKey}`);
+        const monthlySnapshot = await monthlyCollectedRef.once("value");
+        const currentMonthly = monthlySnapshot.exists() ? monthlySnapshot.val() : 0;
+        const newMonthly = currentMonthly + totalDue;
+        await monthlyCollectedRef.set(newMonthly);
+  
+        // Mark the room as paid: update rentStatus, lastPaidDate, and nextDueDate.
+        const nextDueDate = new Date(paymentDateObj.getTime());
+        nextDueDate.setDate(nextDueDate.getDate() + 30);
+        await roomRef.update({
+          rentStatus: "Paid",
+          lastPaidDate: paymentDate,
+          nextDueDate: formatDate(nextDueDate)
         });
-    
-        // Initial load with today's date
-        document.getElementById("searchDate").value = formatDate(new Date());
-        getRentDueTenants(formatDate(new Date()));
-    </script>
-  </body>
+  
+        updateRevenueDisplays();
+        getRentDueTenants(paymentDate);
+      } catch (error) {
+        console.error("Error marking rent as paid:", error);
+        showError(`Failed to mark rent as paid for Room ${roomNumber}. Please try again.`);
+      }
+    }
+  
+    // ----------------------------------------------------------------
+    // Tenant Functions
+    // ----------------------------------------------------------------
+    // Fetch and display tenants with rent due based on the search date.
+    async function getRentDueTenants(searchDateStr) {
+      try {
+        const searchDate = parseDate(searchDateStr);
+        const roomsSnapshot = await db.ref("rooms").once("value");
+        const tenantList = document.getElementById("tenantList");
+        tenantList.innerHTML = "";
+  
+        if (!roomsSnapshot.exists()) {
+          tenantList.innerHTML = `
+            <div class="empty-state">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <h3>No rooms found</h3>
+              <p>No rooms have been added to the system yet.</p>
+            </div>
+          `;
+          return;
+        }
+  
+        let count = 0;
+        const rooms = roomsSnapshot.val();
+  
+        for (const roomNumber in rooms) {
+          const roomData = rooms[roomNumber];
+          let dueDate;
+          if (roomData.nextDueDate) {
+            dueDate = parseDate(roomData.nextDueDate);
+          } else {
+            const baseDate = roomData.lastPaidDate || roomData.moveInDate || formatDate(new Date());
+            dueDate = new Date(parseDate(baseDate).getTime() + (30 * 24 * 60 * 60 * 1000));
+          }
+  
+          if (searchDate >= dueDate) {
+            // If overdue and not paid, update status to Unpaid.
+            if (roomData.rentStatus !== "Paid") {
+              await db.ref(`rooms/${roomNumber}`).update({ rentStatus: "Unpaid" });
+              roomData.rentStatus = "Unpaid";
+            }
+  
+            count++;
+  
+            // Get charges using both potential field names.
+            const rentDueValue = roomData.rent_due != null ? parseInt(roomData.rent_due) : 0;
+            const electricityBillValue = roomData.electricity_bill != null
+              ? parseInt(roomData.electricity_bill)
+              : (roomData.electricityCharges != null ? parseInt(roomData.electricityCharges) : 0);
+            const foodChargeValue = roomData.food_charge != null
+              ? parseInt(roomData.food_charge)
+              : (roomData.foodCharges != null ? parseInt(roomData.foodCharges) : 0);
+  
+            const card = document.createElement("div");
+            card.className = "tenant-card";
+            card.innerHTML = `
+              <div class="tenant-header">
+                <span class="room-number">Room ${roomNumber}</span>
+                <span class="tenant-status ${roomData.rentStatus === 'Paid' ? 'status-paid' : 'status-unpaid'}">
+                  ${roomData.rentStatus}
+                </span>
+              </div>
+              <div class="tenant-body">
+                <div class="tenant-info">
+                  <p><strong>Tenant(s):</strong> ${roomData.tenants ? roomData.tenants.join(", ") : "No tenants"}</p>
+                  <p><strong>Last Paid:</strong> ${roomData.lastPaidDate || "Not paid yet"}</p>
+                  <p><strong>Next Due:</strong> ${roomData.nextDueDate || formatDate(dueDate)}</p>
+                  <p><strong>Rent Due:</strong> ${formatCurrency(rentDueValue)}</p>
+                  <p><strong>Electricity:</strong> ${formatCurrency(electricityBillValue)}</p>
+                  <p><strong>Food Charge:</strong> ${formatCurrency(foodChargeValue)}</p>
+                  <p><strong>Total Due:</strong> ${formatCurrency(rentDueValue + electricityBillValue + foodChargeValue)}</p>
+                </div>
+                <div class="tenant-actions">
+                  <button class="btn btn-outline" onclick="callTenant('${roomData.contactNumbers ? roomData.contactNumbers[0] : ''}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                    Call Tenant
+                  </button>
+                  <button class="btn btn-success" onclick="markRentAsPaid('${roomNumber}', '${searchDateStr}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Mark as Paid
+                  </button>
+                </div>
+              </div>
+            `;
+            tenantList.appendChild(card);
+          }
+        }
+  
+        if (count === 0) {
+          tenantList.innerHTML = `
+            <div class="empty-state">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <h3>No rent dues found</h3>
+              <p>No tenants have rent due for the selected date.</p>
+            </div>
+          `;
+        }
+      }
+      catch (error) {
+        console.error("Error getting rent due tenants:", error);
+        showError("Failed to load tenant data. Please try again.");
+        document.getElementById("tenantList").innerHTML = `
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <h3>Error loading data</h3>
+            <p>There was a problem loading the tenant data. Please try again.</p>
+          </div>
+        `;
+      }
+    }
+  
+    // Function to call tenant (opens the phone dialer)
+    function callTenant(phoneNumber) {
+      if (!phoneNumber) {
+        showError("No phone number available for this tenant.");
+        return;
+      }
+      window.location.href = `tel:${phoneNumber}`;
+    }
+  
+    // ----------------------------------------------------------------
+    // CSV Export Functionality
+    // ----------------------------------------------------------------
+    function exportToCSV() {
+      try {
+        const selectedMonth = parseInt(monthSelector.value);
+        const selectedYear = parseInt(yearSelector.value);
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        db.ref("rooms").once("value", (snapshot) => {
+          if (!snapshot.exists()) {
+            showError("No data to export.");
+            return;
+          }
+          const rooms = snapshot.val();
+          let csvContent = "Room Number,Tenants,Rent Due,Electricity Bill,Food Charge,Total Charges,Last Paid Date,Next Due Date,Status\n";
+          for (const roomNumber in rooms) {
+            const room = rooms[roomNumber];
+            const rentDue = room.rent_due != null ? parseInt(room.rent_due) : 0;
+            const electricityBill = room.electricity_bill != null
+              ? parseInt(room.electricity_bill)
+              : (room.electricityCharges != null ? parseInt(room.electricityCharges) : 0);
+            const foodCharge = room.food_charge != null
+              ? parseInt(room.food_charge)
+              : (room.foodCharges != null ? parseInt(room.foodCharges) : 0);
+            const totalCharges = rentDue + electricityBill + foodCharge;
+            csvContent += `${roomNumber},`;
+            csvContent += `"${room.tenants ? room.tenants.join(", ") : ""}",`;
+            csvContent += `${rentDue},`;
+            csvContent += `${electricityBill},`;
+            csvContent += `${foodCharge},`;
+            csvContent += `${totalCharges},`;
+            csvContent += `${room.lastPaidDate || ""},`;
+            csvContent += `${room.nextDueDate || ""},`;
+            csvContent += `${room.rentStatus || ""}\n`;
+          }
+          const blob = new Blob([csvContent], { type: 'text/csv' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.setAttribute('hidden', '');
+          a.setAttribute('href', url);
+          a.setAttribute('download', `rent-data-${monthNames[selectedMonth]}-${selectedYear}.csv`);
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }, (error) => {
+          console.error("Error exporting data:", error);
+          showError("Failed to export data. Please try again.");
+        });
+      } catch (error) {
+        console.error("Error exporting to CSV:", error);
+        showError("Failed to export data. Please try again.");
+      }
+    }
+  
+    // ----------------------------------------------------------------
+    // Event Listeners and App Initialization
+    // ----------------------------------------------------------------
+    document.getElementById("searchButton").addEventListener("click", function() {
+      const searchDate = document.getElementById("searchDate").value;
+      getRentDueTenants(searchDate);
+    });
+  
+    monthSelector.addEventListener("change", updateRevenueDisplays);
+    yearSelector.addEventListener("change", updateRevenueDisplays);
+    document.getElementById("exportBtn").addEventListener("click", exportToCSV);
+  
+    async function initApp() {
+      try {
+        await initializeTotalRevenue();
+        await initializeMonthlyCollected();
+        updateRevenueDisplays();
+        const today = formatDate(new Date());
+        getRentDueTenants(today);
+      } catch (error) {
+        console.error("Error initializing app:", error);
+        showError("Failed to initialize the application. Please refresh the page.");
+      }
+    }
+  
+    initApp();
+  
+    // Expose functions for onclick handlers
+    window.markRentAsPaid = markRentAsPaid;
+    window.callTenant = callTenant;
+  </script>
+</body>
 </html>
