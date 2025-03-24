@@ -401,6 +401,32 @@
       animation: highlight-form 1s ease-out;
     }
 
+    /* Button Group */
+    .button-group {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 1rem;
+    }
+
+    .update-button {
+      background: var(--secondary);
+      color: white;
+    }
+
+    .update-button:hover {
+      background: var(--secondary-dark);
+    }
+
+    .allocate-button {
+      background: var(--primary);
+      color: white;
+    }
+
+    .allocate-button:hover {
+      background: var(--primary-dark);
+    }
+
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .room-grid {
@@ -422,6 +448,35 @@
       .allocation-container {
         margin-top: 80px;
       }
+      
+      .button-group {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Tenant section styling */
+    .tenant-container {
+      border: 1px solid var(--light-gray);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      background-color: var(--white);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tenant-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--light-gray);
+    }
+
+    .tenant-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--primary);
     }
   </style>
 </head>
@@ -429,7 +484,7 @@
   <header class="header">
     <div class="header-container">
       <a href="/" class="logo">
-        mytenants.in
+        mytenants.online
       </a>
       <div class="header-actions">
         <button id="exportBtn" class="btn btn-primary">
@@ -450,103 +505,171 @@
     <!-- Form with ID for scrolling target -->
     <form id="allocationForm">
       <input type="hidden" id="selectedRoom" value="">
+      <input type="hidden" id="currentAction" value="allocate">
       
-      <!-- Basic Details Section -->
-      <div class="form-section">
-        <h3 class="section-title">Basic Details</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="moveInDate">Move-In Date</label>
-            <input type="date" id="moveInDate" required>
+      <!-- Tenant 1 Container -->
+      <div id="tenant1Container" class="tenant-container">
+        <div class="tenant-header">
+          <h3 class="tenant-title">Tenant 1</h3>
+        </div>
+        
+        <!-- Tenant 1 Basic Details Section -->
+        <div class="form-section">
+          <h3 class="section-title">Basic Details</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="moveInDate1">Move-In Date</label>
+              <input type="date" id="moveInDate1" required>
+            </div>
+            <div class="form-group">
+              <label for="rentStatus1">Rent Status</label>
+              <select id="rentStatus1" required>
+                <option value="Pending">Pending</option>
+                <option value="Unpaid">Unpaid</option>
+                <option value="Paid">Paid</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="lastPaidDate1">Last Paid Date</label>
+              <input type="date" id="lastPaidDate1" required>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="rentStatus">Rent Status</label>
-            <select id="rentStatus" required>
-              <option value="Pending">Pending</option>
-              <option value="Unpaid">Unpaid</option>
-              <option value="Paid">Paid</option>
-            </select>
+        </div>
+
+        <!-- Tenant 1 Financial Details Section -->
+        <div class="form-section">
+          <h3 class="section-title">Financial Details</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="rentAmount1">Rent Amount</label>
+              <input type="number" id="rentAmount1" placeholder="Enter amount" required>
+            </div>
+            <div class="form-group">
+              <label for="foodCharges1">Food Charges</label>
+              <input type="number" id="foodCharges1" placeholder="Enter food charges">
+            </div>
+            <div class="form-group">
+              <label for="electricityCharges1">Electricity Charges</label>
+              <input type="number" id="electricityCharges1" placeholder="Enter electricity charges">
+            </div>
           </div>
-          <div class="form-group">
-            <label for="lastPaidDate">Last Paid Date</label>
-            <input type="date" id="lastPaidDate" required>
+        </div>
+
+        <!-- Tenant 1 Details Section -->
+        <div class="form-section">
+          <h3 class="section-title">Personal Details</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="tenantName1">Full Name</label>
+              <input type="text" id="tenantName1" placeholder="Full name" required>
+            </div>
+            <div class="form-group">
+              <label for="tenantGender1">Gender</label>
+              <select id="tenantGender1" required>
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="tenantContact1">Contact</label>
+              <input type="text" id="tenantContact1" placeholder="Phone number" required>
+            </div>
+            <div class="form-group">
+              <label for="tenantGovtId1">Government ID</label>
+              <input type="text" id="tenantGovtId1" placeholder="Aadhaar/Voter ID/etc." required>
+            </div>
+          </div>
+          
+          <!-- Tenant 1 Action Buttons -->
+          <div class="button-group">
+            <button type="button" class="update-button" id="updateButton1">Update Tenant</button>
+            <button type="button" class="allocate-button" id="allocateButton1">Allocate Room</button>
+            <button type="button" class="vacant-button" id="vacantButton1">Vacant Room</button>
           </div>
         </div>
       </div>
 
-      <!-- Financial Details Section -->
-      <div class="form-section">
-        <h3 class="section-title">Financial Details</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="rentAmount">Rent Amount</label>
-            <input type="number" id="rentAmount" placeholder="Enter amount" required>
+      <!-- Tenant 2 Container -->
+      <div id="tenant2Container" class="tenant-container">
+        <div class="tenant-header">
+          <h3 class="tenant-title">Tenant 2 (Optional)</h3>
+        </div>
+        
+        <!-- Tenant 2 Basic Details Section -->
+        <div class="form-section">
+          <h3 class="section-title">Basic Details</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="moveInDate2">Move-In Date</label>
+              <input type="date" id="moveInDate2">
+            </div>
+            <div class="form-group">
+              <label for="rentStatus2">Rent Status</label>
+              <select id="rentStatus2">
+                <option value="Pending">Pending</option>
+                <option value="Unpaid">Unpaid</option>
+                <option value="Paid">Paid</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="lastPaidDate2">Last Paid Date</label>
+              <input type="date" id="lastPaidDate2">
+            </div>
           </div>
-          <div class="form-group">
-            <label for="foodCharges">Food Charges</label>
-            <input type="number" id="foodCharges" placeholder="Enter food charges">
+        </div>
+
+        <!-- Tenant 2 Financial Details Section -->
+        <div class="form-section">
+          <h3 class="section-title">Financial Details</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="rentAmount2">Rent Amount</label>
+              <input type="number" id="rentAmount2" placeholder="Enter amount">
+            </div>
+            <div class="form-group">
+              <label for="foodCharges2">Food Charges</label>
+              <input type="number" id="foodCharges2" placeholder="Enter food charges">
+            </div>
+            <div class="form-group">
+              <label for="electricityCharges2">Electricity Charges</label>
+              <input type="number" id="electricityCharges2" placeholder="Enter electricity charges">
+            </div>
           </div>
-          <div class="form-group">
-            <label for="electricityCharges">Electricity Charges</label>
-            <input type="number" id="electricityCharges" placeholder="Enter electricity charges">
+        </div>
+
+        <!-- Tenant 2 Details Section -->
+        <div class="form-section">
+          <h3 class="section-title">Personal Details</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="tenantName2">Full Name</label>
+              <input type="text" id="tenantName2" placeholder="Full name">
+            </div>
+            <div class="form-group">
+              <label for="tenantGender2">Gender</label>
+              <select id="tenantGender2">
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="tenantContact2">Contact</label>
+              <input type="text" id="tenantContact2" placeholder="Phone number">
+            </div>
+            <div class="form-group">
+              <label for="tenantGovtId2">Government ID</label>
+              <input type="text" id="tenantGovtId2" placeholder="Aadhaar/Voter ID/etc.">
+            </div>
+          </div>
+          
+          <!-- Tenant 2 Action Buttons -->
+          <div class="button-group">
+            <button type="button" class="update-button" id="updateButton2">Update Tenant</button>
+            <button type="button" class="allocate-button" id="allocateButton2">Allocate Room</button>
+            <button type="button" class="vacant-button" id="vacantButton2">Vacant Room</button>
           </div>
         </div>
       </div>
-
-      <!-- Tenant 1 Details Section -->
-      <div id="tenant1Section" class="form-section">
-        <h3 class="section-title">Tenant 1 Details</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="tenantName1">Full Name</label>
-            <input type="text" id="tenantName1" placeholder="Full name" required>
-          </div>
-          <div class="form-group">
-            <label for="tenantGender1">Gender</label>
-            <select id="tenantGender1" required>
-              <option value="M">Male</option>
-              <option value="F">Female</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="tenantContact1">Contact</label>
-            <input type="text" id="tenantContact1" placeholder="Phone number" required>
-          </div>
-          <div class="form-group">
-            <label for="tenantGovtId1">Government ID</label>
-            <input type="text" id="tenantGovtId1" placeholder="Aadhaar/Voter ID/etc." required>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tenant 2 Details Section -->
-      <div class="form-section">
-        <h3 class="section-title">Tenant 2 Details (Optional)</h3>
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="tenantName2">Full Name</label>
-            <input type="text" id="tenantName2" placeholder="Full name">
-          </div>
-          <div class="form-group">
-            <label for="tenantGender2">Gender</label>
-            <select id="tenantGender2">
-              <option value="M">Male</option>
-              <option value="F">Female</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="tenantContact2">Contact</label>
-            <input type="text" id="tenantContact2" placeholder="Phone number">
-          </div>
-          <div class="form-group">
-            <label for="tenantGovtId2">Government ID</label>
-            <input type="text" id="tenantGovtId2" placeholder="Aadhaar/Voter ID/etc.">
-          </div>
-        </div>
-      </div>
-
-      <button type="submit">Allocate Room</button>
-      <button type="button" class="vacant-button" id="vacantButton">Vacant Room</button>
     </form>
   </div>
 
@@ -582,7 +705,7 @@
   <script type="module">
     // Firebase Configuration
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
-    import { getDatabase, ref, set, get, remove, onValue } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+    import { getDatabase, ref, set, get, remove, onValue, update } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBEX5lj5VRhmlxAhHskQJVB1G6uoVEVvmQ",
@@ -687,7 +810,7 @@
             
             // Focus on the first input field after scrolling
             setTimeout(() => {
-              document.getElementById("moveInDate").focus();
+              document.getElementById("moveInDate1").focus();
             }, 800); // Delay to allow scroll to complete
           });
           
@@ -753,23 +876,33 @@
         if (snapshot.exists()) {
           const roomData = snapshot.val();
           
-          // Basic details
-          document.getElementById("moveInDate").value = roomData.moveInDate || '';
-          document.getElementById("rentStatus").value = roomData.rentStatus || 'Pending';
-          document.getElementById("lastPaidDate").value = roomData.lastPaidDate || roomData.moveInDate || '';
+          // Tenant 1 Basic details
+          document.getElementById("moveInDate1").value = roomData.moveInDate1 || roomData.moveInDate || '';
+          document.getElementById("rentStatus1").value = roomData.rentStatus1 || roomData.rentStatus || 'Pending';
+          document.getElementById("lastPaidDate1").value = roomData.lastPaidDate1 || roomData.lastPaidDate || roomData.moveInDate || '';
           
-          // Financial details
-          document.getElementById("rentAmount").value = roomData.rent_due || '';
-          document.getElementById("foodCharges").value = roomData.foodCharges || '';
-          document.getElementById("electricityCharges").value = roomData.electricityCharges || '';
+          // Tenant 1 Financial details
+          document.getElementById("rentAmount1").value = roomData.rentAmount1 || roomData.rentAmount || roomData.rent_due || '';
+          document.getElementById("foodCharges1").value = roomData.foodCharges1 || roomData.foodCharges || '';
+          document.getElementById("electricityCharges1").value = roomData.electricityCharges1 || roomData.electricityCharges || '';
           
-          // Tenant 1 details
+          // Tenant 1 Personal details
           document.getElementById("tenantName1").value = roomData.tenants ? roomData.tenants[0] || '' : '';
           document.getElementById("tenantGender1").value = roomData.gender1 || roomData.gender || 'M';
           document.getElementById("tenantContact1").value = roomData.contactNumbers ? roomData.contactNumbers[0] || '' : '';
           document.getElementById("tenantGovtId1").value = roomData.govtIds ? roomData.govtIds[0] || '' : '';
           
-          // Tenant 2 details
+          // Tenant 2 Basic details
+          document.getElementById("moveInDate2").value = roomData.moveInDate2 || roomData.moveInDate || '';
+          document.getElementById("rentStatus2").value = roomData.rentStatus2 || roomData.rentStatus || 'Pending';
+          document.getElementById("lastPaidDate2").value = roomData.lastPaidDate2 || roomData.lastPaidDate || roomData.moveInDate || '';
+          
+          // Tenant 2 Financial details
+          document.getElementById("rentAmount2").value = roomData.rentAmount2 || roomData.rentAmount || roomData.rent_due || '';
+          document.getElementById("foodCharges2").value = roomData.foodCharges2 || roomData.foodCharges || '';
+          document.getElementById("electricityCharges2").value = roomData.electricityCharges2 || roomData.electricityCharges || '';
+          
+          // Tenant 2 Personal details
           document.getElementById("tenantName2").value = roomData.tenants && roomData.tenants.length > 1 ? roomData.tenants[1] || '' : '';
           document.getElementById("tenantGender2").value = roomData.gender2 || 'M';
           document.getElementById("tenantContact2").value = roomData.contactNumbers && roomData.contactNumbers.length > 1 ? roomData.contactNumbers[1] || '' : '';
@@ -786,99 +919,202 @@
 
     // Reset form fields
     function resetForm() {
-      document.getElementById("moveInDate").value = '';
-      document.getElementById("rentStatus").value = 'Pending';
-      document.getElementById("lastPaidDate").value = '';
-      document.getElementById("rentAmount").value = '';
-      document.getElementById("foodCharges").value = '';
-      document.getElementById("electricityCharges").value = '';
+      // Tenant 1
+      document.getElementById("moveInDate1").value = '';
+      document.getElementById("rentStatus1").value = 'Pending';
+      document.getElementById("lastPaidDate1").value = '';
+      document.getElementById("rentAmount1").value = '';
+      document.getElementById("foodCharges1").value = '';
+      document.getElementById("electricityCharges1").value = '';
       document.getElementById("tenantName1").value = '';
       document.getElementById("tenantGender1").value = 'M';
       document.getElementById("tenantContact1").value = '';
       document.getElementById("tenantGovtId1").value = '';
+      
+      // Tenant 2
+      document.getElementById("moveInDate2").value = '';
+      document.getElementById("rentStatus2").value = 'Pending';
+      document.getElementById("lastPaidDate2").value = '';
+      document.getElementById("rentAmount2").value = '';
+      document.getElementById("foodCharges2").value = '';
+      document.getElementById("electricityCharges2").value = '';
       document.getElementById("tenantName2").value = '';
       document.getElementById("tenantGender2").value = 'M';
       document.getElementById("tenantContact2").value = '';
       document.getElementById("tenantGovtId2").value = '';
     }
 
-    // Handle form submission for allocation
-    document.getElementById("allocationForm").addEventListener("submit", function(event) {
-      event.preventDefault();
+    // Get form data for saving to Firebase
+    function getFormData() {
+      const roomData = {
+        // Tenant 1 data
+        moveInDate1: document.getElementById("moveInDate1").value,
+        rentStatus1: document.getElementById("rentStatus1").value,
+        lastPaidDate1: document.getElementById("lastPaidDate1").value || document.getElementById("moveInDate1").value,
+        rentAmount1: parseFloat(document.getElementById("rentAmount1").value) || 0,
+        foodCharges1: parseFloat(document.getElementById("foodCharges1").value) || 0,
+        electricityCharges1: parseFloat(document.getElementById("electricityCharges1").value) || 0,
+        
+        // Tenant 2 data
+        moveInDate2: document.getElementById("moveInDate2").value,
+        rentStatus2: document.getElementById("rentStatus2").value,
+        lastPaidDate2: document.getElementById("lastPaidDate2").value || document.getElementById("moveInDate2").value,
+        rentAmount2: parseFloat(document.getElementById("rentAmount2").value) || 0,
+        foodCharges2: parseFloat(document.getElementById("foodCharges2").value) || 0,
+        electricityCharges2: parseFloat(document.getElementById("electricityCharges2").value) || 0,
+        
+        // For backward compatibility and room status
+        moveInDate: document.getElementById("moveInDate1").value,
+        rentStatus: document.getElementById("rentStatus1").value,
+        lastPaidDate: document.getElementById("lastPaidDate1").value || document.getElementById("moveInDate1").value,
+        
+        // Tenant details arrays
+        tenants: [
+          document.getElementById("tenantName1").value,
+          document.getElementById("tenantName2").value
+        ].filter(val => val && val.trim() !== ""),
+        
+        contactNumbers: [
+          document.getElementById("tenantContact1").value,
+          document.getElementById("tenantContact2").value
+        ].filter(val => val && val.trim() !== ""),
+        
+        govtIds: [
+          document.getElementById("tenantGovtId1").value,
+          document.getElementById("tenantGovtId2").value
+        ].filter(val => val && val.trim() !== "")
+      };
+      
+      // Calculate total charges for each tenant
+      roomData.totalCharges1 = roomData.rentAmount1 + roomData.foodCharges1 + roomData.electricityCharges1;
+      roomData.totalCharges2 = roomData.rentAmount2 + roomData.foodCharges2 + roomData.electricityCharges2;
+      
+      // Total charges for the room (for backward compatibility)
+      roomData.totalCharges = roomData.totalCharges1 + roomData.totalCharges2;
+      
+      // Add gender information
+      roomData.gender1 = document.getElementById("tenantGender1").value;
+      roomData.gender2 = document.getElementById("tenantGender2").value;
+      
+      // For backward compatibility
+      roomData.gender = document.getElementById("tenantGender1").value;
+      
+      // Determine occupancy status
+      const tenant2Name = document.getElementById("tenantName2").value.trim();
+      roomData.occupancyStatus = tenant2Name ? "Fully Occupied" : "Partially Occupied";
+      
+      return roomData;
+    }
 
+    // Update revenue data in Firebase
+    async function updateRevenueData(roomNumber, roomData, isNewAllocation = false, isVacating = false) {
+      try {
+        // Get current revenue data
+        const revenueRef = ref(database, 'revenue');
+        const revenueSnapshot = await get(revenueRef);
+        const revenueData = revenueSnapshot.exists() ? revenueSnapshot.val() : {};
+        
+        // Get current monthly collected data
+        const monthlyRef = ref(database, 'monthlyCollected');
+        const monthlySnapshot = await get(monthlyRef);
+        const monthlyData = monthlySnapshot.exists() ? monthlySnapshot.val() : {};
+        
+        // Get current total revenue
+        const totalRevenueRef = ref(database, 'totalRevenue');
+        const totalRevenueSnapshot = await get(totalRevenueRef);
+        const totalRevenue = totalRevenueSnapshot.exists() ? totalRevenueSnapshot.val() : 0;
+        
+        // Current date for monthly tracking
+        const currentDate = new Date();
+        const currentMonth = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`;
+        
+        if (isVacating) {
+          // If vacating, we don't need to update revenue data
+          return;
+        }
+        
+        // Calculate total charges for this room
+        const totalCharges = roomData.totalCharges || 0;
+        
+        // Update revenue data for this room
+        revenueData[roomNumber] = {
+          rentAmount: roomData.rentAmount1 + roomData.rentAmount2 || 0,
+          foodCharges: roomData.foodCharges1 + roomData.foodCharges2 || 0,
+          electricityCharges: roomData.electricityCharges1 + roomData.electricityCharges2 || 0,
+          totalCharges: totalCharges,
+          lastUpdated: new Date().toISOString()
+        };
+        
+        // Update monthly collected data
+        if (!monthlyData[currentMonth]) {
+          monthlyData[currentMonth] = 0;
+        }
+        
+        // If this is a new allocation or rent status changed to "Paid", add to monthly collected
+        if (isNewAllocation) {
+          if (roomData.rentStatus1 === "Paid") {
+            monthlyData[currentMonth] += roomData.totalCharges1;
+          }
+          if (roomData.rentStatus2 === "Paid" && roomData.tenants.length > 1) {
+            monthlyData[currentMonth] += roomData.totalCharges2;
+          }
+        }
+        
+        // Update total revenue if this is a new paid allocation
+        let newTotalRevenue = totalRevenue;
+        if (isNewAllocation) {
+          if (roomData.rentStatus1 === "Paid") {
+            newTotalRevenue += roomData.totalCharges1;
+          }
+          if (roomData.rentStatus2 === "Paid" && roomData.tenants.length > 1) {
+            newTotalRevenue += roomData.totalCharges2;
+          }
+        }
+        
+        // Save all updates to Firebase
+        await update(ref(database), {
+          'revenue': revenueData,
+          'monthlyCollected': monthlyData,
+          'totalRevenue': newTotalRevenue
+        });
+        
+      } catch (error) {
+        console.error("Error updating revenue data:", error);
+        showPopup("Error updating revenue data: " + error.message, "error");
+      }
+    }
+
+    // Allocate Room Function
+    async function allocateRoom() {
       const roomNumber = document.getElementById("selectedRoom").value;
       if (!roomNumber) {
         showPopup("Please select a room first.", "error");
         return;
       }
 
-      // Basic details
-      const moveInDate = document.getElementById("moveInDate").value;
-      const rentStatus = document.getElementById("rentStatus").value;
-      const lastPaidDate = document.getElementById("lastPaidDate").value || moveInDate;
-      
-      // Financial details
-      const rentAmount = document.getElementById("rentAmount").value;
-      const foodCharges = document.getElementById("foodCharges").value;
-      const electricityCharges = document.getElementById("electricityCharges").value;
-      
-      // Tenant 1 details
-      const tenantName1 = document.getElementById("tenantName1").value;
-      const tenantGender1 = document.getElementById("tenantGender1").value;
-      const tenantContact1 = document.getElementById("tenantContact1").value;
-      const tenantGovtId1 = document.getElementById("tenantGovtId1").value;
-      
-      // Tenant 2 details
-      const tenantName2 = document.getElementById("tenantName2").value.trim();
-      const tenantGender2 = document.getElementById("tenantGender2").value;
-      const tenantContact2 = document.getElementById("tenantContact2").value.trim();
-      const tenantGovtId2 = document.getElementById("tenantGovtId2").value.trim();
-
-      // Determine occupancy based on whether tenantName2 is provided
-      const occupancyStatus = tenantName2 ? "Fully Occupied" : "Partially Occupied";
-
-      // Build the roomData object without undefined values
-      let roomData = {
-        // Basic details
-        moveInDate: moveInDate,
-        rentStatus: rentStatus,
-        lastPaidDate: lastPaidDate,
-        occupancyStatus: occupancyStatus,
-        
-        // Financial details
-        rent_due: rentAmount,
-        foodCharges: foodCharges || "",
-        electricityCharges: electricityCharges || "",
-        
-        // Tenant details
-        tenants: [tenantName1, tenantName2].filter(val => val && val.trim() !== ""),
-        contactNumbers: [tenantContact1, tenantContact2].filter(val => val && val.trim() !== ""),
-        govtIds: [tenantGovtId1, tenantGovtId2].filter(val => val && val.trim() !== "")
-      };
-
-      if (tenantName2) {
-        // For multiple tenants, add gender1 and gender2
-        roomData.gender1 = tenantGender1 || "M";
-        roomData.gender2 = tenantGender2 || "M";
-      } else {
-        // For a single tenant, add gender
-        roomData.gender = tenantGender1 || "M";
-      }
-
+      const roomData = getFormData();
       const roomRef = ref(database, 'rooms/' + roomNumber);
-
-      // Save (or update) room details in Firebase
-      set(roomRef, roomData).then(() => {
+      
+      try {
+        // Check if this is a new allocation
+        const roomSnapshot = await get(roomRef);
+        const isNewAllocation = !roomSnapshot.exists();
+        
+        // Save room details in Firebase
+        await set(roomRef, roomData);
+        
+        // Update revenue data
+        await updateRevenueData(roomNumber, roomData, isNewAllocation);
+        
         showPopup("Room allocated successfully!", "success");
         resetForm();
-        // Room status will update automatically via the onValue listener
-      }).catch((error) => {
+      } catch (error) {
         showPopup("Error allocating room: " + error.message, "error");
-      });
-    });
+      }
+    }
 
-    // Vacant Button Functionality
-    document.getElementById("vacantButton").addEventListener("click", function() {
+    // Update Tenant 1 Function
+    async function updateTenant1() {
       const roomNumber = document.getElementById("selectedRoom").value;
       if (!roomNumber) {
         showPopup("Please select a room first.", "error");
@@ -886,14 +1122,165 @@
       }
 
       const roomRef = ref(database, 'rooms/' + roomNumber);
-      remove(roomRef).then(() => {
-        showPopup("Room vacated successfully!", "success");
-        resetForm();
-        // Room status will update automatically via the onValue listener
-      }).catch((error) => {
+      
+      try {
+        // Get current data first
+        const snapshot = await get(roomRef);
+        
+        if (snapshot.exists()) {
+          const currentData = snapshot.val();
+          
+          // Update tenant 1 details
+          const updates = {
+            // Basic details
+            moveInDate1: document.getElementById("moveInDate1").value,
+            rentStatus1: document.getElementById("rentStatus1").value,
+            lastPaidDate1: document.getElementById("lastPaidDate1").value || document.getElementById("moveInDate1").value,
+            
+            // Financial details
+            rentAmount1: parseFloat(document.getElementById("rentAmount1").value) || 0,
+            foodCharges1: parseFloat(document.getElementById("foodCharges1").value) || 0,
+            electricityCharges1: parseFloat(document.getElementById("electricityCharges1").value) || 0,
+            totalCharges1: parseFloat(document.getElementById("rentAmount1").value) + 
+                          parseFloat(document.getElementById("foodCharges1").value) + 
+                          parseFloat(document.getElementById("electricityCharges1").value) || 0,
+            
+            // For backward compatibility
+            moveInDate: document.getElementById("moveInDate1").value,
+            rentStatus: document.getElementById("rentStatus1").value,
+            lastPaidDate: document.getElementById("lastPaidDate1").value || document.getElementById("moveInDate1").value,
+            
+            // Tenant arrays
+            tenants: currentData.tenants || [],
+            contactNumbers: currentData.contactNumbers || [],
+            govtIds: currentData.govtIds || [],
+            
+            // Gender
+            gender1: document.getElementById("tenantGender1").value,
+            gender: document.getElementById("tenantGender1").value
+          };
+          
+          // Update tenant 1 details in arrays
+          updates.tenants[0] = document.getElementById("tenantName1").value;
+          updates.contactNumbers[0] = document.getElementById("tenantContact1").value;
+          updates.govtIds[0] = document.getElementById("tenantGovtId1").value;
+          
+          // Update in Firebase
+          await update(roomRef, updates);
+          showPopup("Tenant 1 details updated successfully!", "success");
+        } else {
+          showPopup("No data found for this room. Please allocate first.", "error");
+        }
+      } catch (error) {
+        showPopup("Error updating tenant details: " + error.message, "error");
+      }
+    }
+
+    // Update Tenant 2 Function
+    async function updateTenant2() {
+      const roomNumber = document.getElementById("selectedRoom").value;
+      if (!roomNumber) {
+        showPopup("Please select a room first.", "error");
+        return;
+      }
+
+      const roomRef = ref(database, 'rooms/' + roomNumber);
+      
+      try {
+        // Get current data first
+        const snapshot = await get(roomRef);
+        
+        if (snapshot.exists()) {
+          const currentData = snapshot.val();
+          
+          // Update tenant 2 details
+          const updates = {
+            // Basic details
+            moveInDate2: document.getElementById("moveInDate2").value,
+            rentStatus2: document.getElementById("rentStatus2").value,
+            lastPaidDate2: document.getElementById("lastPaidDate2").value || document.getElementById("moveInDate2").value,
+            
+            // Financial details
+            rentAmount2: parseFloat(document.getElementById("rentAmount2").value) || 0,
+            foodCharges2: parseFloat(document.getElementById("foodCharges2").value) || 0,
+            electricityCharges2: parseFloat(document.getElementById("electricityCharges2").value) || 0,
+            totalCharges2: parseFloat(document.getElementById("rentAmount2").value) + 
+                          parseFloat(document.getElementById("foodCharges2").value) + 
+                          parseFloat(document.getElementById("electricityCharges2").value) || 0,
+            
+            // Tenant arrays
+            tenants: currentData.tenants || [],
+            contactNumbers: currentData.contactNumbers || [],
+            govtIds: currentData.govtIds || [],
+            
+            // Gender
+            gender2: document.getElementById("tenantGender2").value
+          };
+          
+          // Update tenant 2 details in arrays
+          updates.tenants[1] = document.getElementById("tenantName2").value;
+          updates.contactNumbers[1] = document.getElementById("tenantContact2").value;
+          updates.govtIds[1] = document.getElementById("tenantGovtId2").value;
+          
+          // Update occupancy status
+          if (updates.tenants[1] && updates.tenants[1].trim() !== "") {
+            updates.occupancyStatus = "Fully Occupied";
+          } else {
+            updates.occupancyStatus = "Partially Occupied";
+          }
+          
+          // Update in Firebase
+          await update(roomRef, updates);
+          showPopup("Tenant 2 details updated successfully!", "success");
+        } else {
+          showPopup("No data found for this room. Please allocate first.", "error");
+        }
+      } catch (error) {
+        showPopup("Error updating tenant details: " + error.message, "error");
+      }
+    }
+
+    // Vacant Button Functionality
+    async function vacateRoom() {
+      const roomNumber = document.getElementById("selectedRoom").value;
+      if (!roomNumber) {
+        showPopup("Please select a room first.", "error");
+        return;
+      }
+
+      const roomRef = ref(database, 'rooms/' + roomNumber);
+      
+      try {
+        // Get room data before removing
+        const snapshot = await get(roomRef);
+        if (snapshot.exists()) {
+          const roomData = snapshot.val();
+          
+          // Remove room from rooms collection
+          await remove(roomRef);
+          
+          // Update revenue data to reflect the vacancy
+          await updateRevenueData(roomNumber, roomData, false, true);
+          
+          showPopup("Room vacated successfully!", "success");
+          resetForm();
+        } else {
+          showPopup("Room is already vacant.", "info");
+        }
+      } catch (error) {
         showPopup("Error vacating room: " + error.message, "error");
-      });
-    });
+      }
+    }
+
+    // Add event listeners for tenant 1 buttons
+    document.getElementById("updateButton1").addEventListener("click", updateTenant1);
+    document.getElementById("allocateButton1").addEventListener("click", allocateRoom);
+    document.getElementById("vacantButton1").addEventListener("click", vacateRoom);
+
+    // Add event listeners for tenant 2 buttons
+    document.getElementById("updateButton2").addEventListener("click", updateTenant2);
+    document.getElementById("allocateButton2").addEventListener("click", allocateRoom);
+    document.getElementById("vacantButton2").addEventListener("click", vacateRoom);
 
     // Initialize room grid on page load
     generateRoomGrid();
