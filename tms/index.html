@@ -1,9 +1,13 @@
+new index :
+
+
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mytenants.in</title>
+    <title>mytenants.online</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap"
       rel="stylesheet"
@@ -108,7 +112,7 @@
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
-          padding: 0.5rem 1rem;
+          padding: 0.3rem;
           border-radius: var(--border-radius);
           font-weight: 500;
           font-size: 0.875rem;
@@ -609,7 +613,7 @@
           <!-- <svg class="logo-icon" viewBox="0 0 24 24">
             <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" />
           </svg> -->
-          mytenants.in
+          mytenants.online
         </a>
         <div class="header-actions">
           <button id="exportBtn" class="btn btn-primary">
@@ -657,13 +661,13 @@
               </div>
             </div>
             <div class="stat-card">
-              <div class="stat-title">Pending Rent</div>
+              <div class="stat-title">Monthly Revenue</div>
               <div class="stat-value" id="pendingRent">₹0</div>
               <div class="stat-trend trend-down">
                 <svg class="trend-icon" viewBox="0 0 24 24">
                   <path d="M7 10l5 5 5-5z" />
                 </svg>
-                <span id="pendingTrend">0% from last month</span>
+                <span id="pendingTrend">Monthly revenue updated</span>
               </div>
             </div>
           </div>
@@ -1015,110 +1019,122 @@
         });
       }
 
-      // Update dashboard stats
-      function updateDashboardStats(rooms) {
-        let totalTenants = 0;
-        let totalRevenue = 0;
-        let rentPaid = 0;
-        let fullyOccupied = 0;
-        let partiallyOccupied = 0;
-        let vacant = 0;
-        
-        // Process room data
-        for (const roomNumber in rooms) {
-          const room = rooms[roomNumber];
-          
-          // Count tenants
-          if (room.tenants && Array.isArray(room.tenants)) {
-            totalTenants += room.tenants.length;
-          }
-          
-          // Calculate revenue
-          if (room.rent) {
-            totalRevenue += parseFloat(room.rent);
-          } else if (room.tenants && room.tenants.length > 0) {
-            // Assume default rent of 5000 per tenant if not specified
-            totalRevenue += room.tenants.length * 5000;
-          }
-          
-          // Calculate rent paid
-          if (room.rentPaid) {
-            rentPaid += parseFloat(room.rentPaid);
-          }
-          
-          // Count room occupancy status
-          if (room.occupancyStatus === "Fully Occupied") {
-            fullyOccupied++;
-          } else if (room.occupancyStatus === "Partially Occupied") {
-            partiallyOccupied++;
-          } else {
-            vacant++;
-          }
-        }
-        
-        // Calculate pending rent
-        const pendingRent = totalRevenue - rentPaid;
-        
-        // Update UI
-        totalTenantsEl.textContent = totalTenants;
-        totalRevenueEl.textContent = `₹${totalRevenue.toLocaleString()}`;
-        pendingRentEl.textContent = `₹${pendingRent.toLocaleString()}`;
-        
-        // Sample trend data (in a real app, this would come from historical data)
-        tenantsTrendEl.textContent = "+12% from last month";
-        revenueTrendEl.textContent = "+8% from last month";
-        pendingTrendEl.textContent = "-5% from last month";
-        
-        // Update charts
-        updateTrendsChart(rooms);
-        
-        // Initialize or update occupancy chart
-        if (!occupancyChart) {
-          initOccupancyChart(fullyOccupied, partiallyOccupied, vacant);
-        } else {
-          occupancyChart.data.datasets[0].data = [fullyOccupied, partiallyOccupied, vacant];
-          occupancyChart.update();
-        }
-      }
+// Update dashboard stats based on room data
+function updateDashboardStats(rooms) {
+  let totalTenants = 0;
+  let monthlyRevenueSum = 0; // This will accumulate the monthly revenue from rooms (for Card 3)
+  let fullyOccupied = 0;
+  let partiallyOccupied = 0;
+  let vacant = 0;
 
-      // Update trends chart
-      function updateTrendsChart(rooms) {
-        // In a real application, you would fetch historical data from Firebase
-        // For this demo, we'll generate some realistic growth data
-        
-        // Get current month and generate last 6 months
-        const months = [];
-        const currentDate = new Date();
-        for (let i = 5; i >= 0; i--) {
-          const month = new Date(currentDate);
-          month.setMonth(currentDate.getMonth() - i);
-          months.push(month.toLocaleString('default', { month: 'short' }));
-        }
-        
-        // Generate tenant growth data (increasing trend)
-        const tenantData = [];
-        const currentTenants = parseInt(totalTenantsEl.textContent) || 30;
-        for (let i = 0; i < 6; i++) {
-          // Start with fewer tenants and gradually increase
-          const factor = 0.6 + (i * 0.08);
-          tenantData.push(Math.round(currentTenants * factor));
-        }
-        
-        // Generate revenue growth data
-        const revenueData = [];
-        const currentRevenue = parseInt(totalRevenueEl.textContent.replace('₹', '').replace(/,/g, '')) || 150000;
-        for (let i = 0; i < 6; i++) {
-          // Start with less revenue and gradually increase
-          const factor = 0.5 + (i * 0.1);
-          revenueData.push(Math.round(currentRevenue * factor));
-        }
-        
-        // Update chart data
-        trendsChart.data.labels = months;
-        trendsChart.data.datasets[0].data = tenantData;
-        trendsChart.data.datasets[1].data = revenueData;
-        trendsChart.update();
-      }
+  // Process each room in your allocated rooms data
+  for (const roomNumber in rooms) {
+    const room = rooms[roomNumber];
+    if (!room) continue; // safety check
+
+    // Count tenants (Card 1)
+    if (room.tenants && Array.isArray(room.tenants)) {
+      totalTenants += room.tenants.length;
+    }
+
+    // Calculate monthly revenue for Card 3:
+    // • If the room has a "rent_due" field, use it.
+    // • Otherwise, if there are tenants present, assume a default (e.g. 5000 per tenant).
+    if (room.rent_due) {
+      monthlyRevenueSum += parseFloat(room.rent_due) || 0;
+    } else if (room.tenants && room.tenants.length > 0) {
+      monthlyRevenueSum += room.tenants.length * 5000;
+    }
+
+    // Tally occupancy statuses for the occupancy chart.
+    if (room.occupancyStatus === "Fully Occupied") {
+      fullyOccupied++;
+    } else if (room.occupancyStatus === "Partially Occupied") {
+      partiallyOccupied++;
+    } else {
+      vacant++;
+    }
+  }
+
+  // Update Total Tenants card
+  totalTenantsEl.textContent = totalTenants;
+
+  // Update Monthly Revenue (Card 3) with the computed amount
+  pendingRentEl.textContent = `₹${monthlyRevenueSum.toLocaleString()}`;
+
+  // Set the trend texts (you may adjust these as needed)
+  tenantsTrendEl.textContent = "+12% from last month";
+  pendingTrendEl.textContent = "Monthly revenue updated";
+
+  // For the Total Revenue card (Card 2), fetch the dedicated value from Firebase.
+  const totalRevenueRef = ref(database, "totalRevenue");
+  get(totalRevenueRef)
+    .then((snapshot) => {
+      const firebaseTotalRevenue =
+        snapshot.exists() ? parseFloat(snapshot.val()) || 0 : 0;
+      totalRevenueEl.textContent = `₹${firebaseTotalRevenue.toLocaleString()}`;
+      
+      // Once we have the updated total revenue, update the trends chart.
+      updateTrendsChart(rooms);
+    })
+    .catch((error) => {
+      console.error("Error fetching total revenue:", error);
+      totalRevenueEl.textContent = "₹0";
+      updateTrendsChart(rooms);
+    });
+
+  // Update the occupancy chart with the latest counts.
+  if (!occupancyChart) {
+    initOccupancyChart(fullyOccupied, partiallyOccupied, vacant);
+  } else {
+    occupancyChart.data.datasets[0].data = [fullyOccupied, partiallyOccupied, vacant];
+    occupancyChart.update();
+  }
+}
+
+// Update trends chart (Revenue & Occupancy Trends)
+// In this demo, we generate sample historical data using current values.
+function updateTrendsChart(rooms) {
+  // Generate labels for the last 6 months.
+  const months = [];
+  const currentDate = new Date();
+  for (let i = 5; i >= 0; i--) {
+    const month = new Date(currentDate);
+    month.setMonth(currentDate.getMonth() - i);
+    months.push(month.toLocaleString("default", { month: "short" }));
+  }
+
+  // Generate tenant growth data (using current total tenants)
+  const tenantData = [];
+  const currentTenants = parseInt(totalTenantsEl.textContent) || 30;
+  for (let i = 0; i < 6; i++) {
+    // Use a scaling factor for a trend simulation
+    const factor = 0.6 + i * 0.08;
+    tenantData.push(Math.round(currentTenants * factor));
+  }
+
+  // Generate revenue growth data using the Total Revenue card value.
+  let currentRevenue = parseInt(
+    totalRevenueEl.textContent.replace("₹", "").replace(/,/g, "")
+  );
+  if (isNaN(currentRevenue) || currentRevenue === 0) {
+    currentRevenue = 150000; // fallback value
+  }
+
+  const revenueData = [];
+  for (let i = 0; i < 6; i++) {
+    const factor = 0.5 + i * 0.1;
+    revenueData.push(Math.round(currentRevenue * factor));
+  }
+
+  // Update the trends chart
+  if (trendsChart) {
+    trendsChart.data.labels = months;
+    trendsChart.data.datasets[0].data = tenantData;
+    trendsChart.data.datasets[1].data = revenueData;
+    trendsChart.update();
+  }
+}
 
       // Fetch and display rooms
       async function searchRooms() {
@@ -1379,3 +1395,4 @@
     </script>
   </body>
 </html>
+
